@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car Rental Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      background-color:#f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+
+    }
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      position: fixed;
+      height: 100vh;
+      padding-top: 1rem;
+    }
+    .sidebar a {
+      display: block;
+      padding: 1rem;
+      color: #333;
+      text-decoration: none;
+    }
+    .sidebar a:hover, .sidebar .active {
+      background-color: #e7f1ff;
+      font-weight: bold;
+      border-left: 5px solid #0d6efd;
+    }
+    .main {
+      margin-left: 220px;
+      padding: 2rem;
+      color: white;
+    }
+    .card-icon {
+      font-size: 1.5rem;
+    }
+    .card {
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .available { background-color: #c4fcd7; color: #0b6837; }
+    .rented { background-color: #cce4f7; color: #176ca0; }
+    .maintenance { background-color: #fde7b2; color: #b37a00; }
+    .car-img { width: 50px; height: auto; }
+    .profile-trigger {
+      cursor: pointer;
+    }
+    .booking-card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .price {
+      color: #4ba4b2;
+      font-weight: bold;
+    }
+    .icon {
+      margin-right: 8px;
+      cursor: pointer;
+    }
+    .section-title {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <img src="sky remove.png"  alt="Logo" style="height: 130px; margin-right: 10px;"><strong>  SKYLINE </strong>
+  <a href="#" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+  <a href="rent-dashboard.html"><i class="bi bi-person"></i> Rent</a>
+  <a href="bookings-dashboard.html"><i class="bi bi-journal-bookmark"></i> Bookings</a>
+  <a href="schedule-dashboard.html"><i class="bi bi-calendar3"></i> Schedule</a>
+  <a href="payments-dashboard.html"><i class="bi bi-credit-card"></i> Payments</a>
+  <a href="#"><i class="bi bi-chat"></i> Messages</a>
+  <a href="#"><i class="bi bi-save"></i> Saved</a>
+  <a href="#"><i class="bi bi-exclamation-circle"></i>Transactions</a>
+  <!-- Car Reports Main Item with Collapse -->
+<a class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#carReportsSubmenu" role="button" aria-expanded="false" aria-controls="carReportsSubmenu">
+    <a href="car reports-dashboard.html"><i class="bi bi-car-front"></i> Car Reports</span>
+    <i class="fas fa-chevron-down small"></i>
+  </a>
+  <div class="collapse ps-4" id="carReportsSubmenu">
+    <a href="#" class="nav-link" onclick="showSection('carDetailsSection')">Car Details</a>
+  </div>
+  ...
+</div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="main text-black">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Dashboard</h2>
+    <div>
+      <input type="text" class="form-control d-inline-block" placeholder="Search anything" style="width: 200px;">
+      <i class="bi bi-bell mx-2" data-bs-toggle="modal" data-bs-target="#notificationModal" role="button"></i>
+      <i class="bi bi-gear mx-2" data-bs-toggle="modal" data-bs-target="#settingsModal" role="button"></i>
+      <span class="profile-trigger" data-bs-toggle="modal" data-bs-target="#profileModal">
+        <img src="profile.jpg" class="rounded-circle" width="30"> John Septimus
+      </span>
+    </div>
+  </div>
+
+  <!-- Info Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-dark p-3">
+        <div>Total Cars <span class="float-end card-icon bi bi-car-front"></span></div>
+        <h5>24</h5>
+        <small class="text-success">↑ 10% from last month</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-dark p-3">
+        <div>Active Bookings <span class="float-end card-icon bi bi-calendar2-check"></span></div>
+        <h5>18</h5>
+        <small class="text-success">↑ 5% from last month</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-dark p-3">
+        <div>Monthly Revenue <span class="float-end card-icon bi bi-currency-dollar"></span></div>
+        <h5>$45,200</h5>
+        <small class="text-danger">↓ 2% from last month</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-dark p-3">
+        <div>Maintenance Alerts <span class="float-end card-icon bi bi-bell"></span></div>
+        <h5>3</h5>
+        <small class="text-success">↑ 0% from last month</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card">
+    <div class="card-body bg-white rounded">
+      <h5 class="text-dark">Revenue Overview</h5>
+      <canvas id="revenueChart" height="100"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Modal -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-end">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="notificationModalLabel">Notifications</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><i class="bi bi-exclamation-circle text-warning"></i> 3 maintenance alerts need attention.</p>
+        <p><i class="bi bi-car-front text-success"></i> 2 new cars added to fleet.</p>
+        <p><i class="bi bi-calendar-check text-info"></i> 5 new bookings today.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-end">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Theme:</strong> <button class="btn btn-sm btn-outline-primary">Switch to Light</button></p>
+        <p><strong>Notifications:</strong> <input type="checkbox" checked> Enable alerts</p>
+        <p><strong>Account:</strong> <a href="#">Manage Profile</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-end">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileModalLabel">User Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center">
+          <img src="profile.jpg" class="rounded-circle mb-3" width="80">
+          <h5>John Septimus</h5>
+          <p class="text-muted">Administrator</p>
+        </div>
+        <hr>
+        <p><strong>Email:</strong> john.septimus@email.com</p>
+        <p><strong>Phone:</strong> +1 234 567 890</p>
+        <p><strong>Joined:</strong> Jan 2023</p>
+        <button class="btn btn-outline-secondary w-100">Edit Profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Main Content -->
+<div class="main text-black">
+ <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Vehicle Fleet</h2>
+    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addVehicleModal">Add Vehicle</button>
+  </div>
+
+  <div class="card p-3 bg-white text-dark">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Vehicle</th>
+          <th>Status</th>
+          <th>Location</th>
+          <th>Last Maintenance</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><img src="ed3.png" class="car-img me-3"> <strong>Mercedes-Benz</strong><br>2024</td>
+          <td><span class="status-badge available" data-bs-toggle="modal" data-bs-target="#statusModal">available</span></td>
+          <td>New York</td>
+          <td>2025-02-15</td>
+          <td>
+            <i class="bi bi-pencil-square text-primary me-3" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+            <i class="bi bi-gear text-warning me-2" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+            <i class="bi bi-trash text-danger" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+          </td>
+        </tr>
+        <tr>
+          <td><img src="ed4.png" class="car-img me-3"> <strong>Toyota Land Cruiser</strong><br>2023</td>
+          <td><span class="status-badge rented" data-bs-toggle="modal" data-bs-target="#statusModal">rented</span></td>
+          <td>Los Angeles</td>
+          <td>2025-01-20</td>
+          <td>
+            <i class="bi bi-pencil-square text-primary me-2" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+            <i class="bi bi-gear text-warning me-2" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+            <i class="bi bi-trash text-danger" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+          </td>
+        </tr>
+        <tr>
+          <td><img src="ed1.png" class="car-img me-3"> <strong>Chevrolet Camaro</strong><br>2024</td>
+          <td><span class="status-badge maintenance" data-bs-toggle="modal" data-bs-target="#statusModal">maintenance</span></td>
+          <td>Chicago</td>
+          <td>2025-03-01</td>
+          <td>
+            <i class="bi bi-pencil-square text-primary me-2" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+            <i class="bi bi-gear text-warning me-2" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+            <i class="bi bi-trash text-danger" data-bs-toggle="modal" data-bs-target="#actionModal"></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div> 
+
+<!-- Add Vehicle Modal -->
+<div class="modal fade" id="addVehicleModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Add Vehicle</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="text" class="form-control mb-2" placeholder="Car Name">
+        <input type="text" class="form-control mb-2" placeholder="Location">
+        <input type="date" class="form-control mb-2">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-success">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Status Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Change Status</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <select class="form-select">
+        <option>available</option>
+        <option>rented</option>
+        <option>maintenance</option>
+      </select>
+    </div>
+  </div></div>
+</div>
+
+<!-- Actions Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Action Options</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <p>Choose action: edit details, change status, or delete vehicle.</p>
+    </div>
+  </div></div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Profile</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <p>Name: John Septimus</p>
+      <p>Email: john@example.com</p>
+      <button class="btn btn-outline-secondary w-100">Logout</button>
+    </div>
+  </div></div>
+</div>
+<div class="container py-5">
+    <div class="row g-4">
+      <!-- Active Bookings -->
+      <div class="col-md-6">
+        <div class="booking-card">
+          <div class="section-title mb-3">Active Bookings</div>
+          <div class="card border-0">
+            <div class="card-body p-0">
+              <div class="d-flex justify-content-between mb-1">
+                <strong>Jane Smith</strong>
+                <span class="price">$980</span>
+              </div>
+              <div class="mb-2">Mercedes-Benz</div>
+              <div class="d-flex text-muted">
+                <div class="me-3" data-bs-toggle="modal" data-bs-target="#calendarModal">
+                  <i class="bi bi-calendar icon"></i>2025-03-10
+                </div>
+                <div data-bs-toggle="modal" data-bs-target="#clockModal">
+                  <i class="bi bi-clock icon"></i>2025-03-17
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Bookings -->
+      <div class="col-md-6">
+        <div class="booking-card">
+          <div class="section-title mb-3">Upcoming Bookings</div>
+          <div class="card border-0">
+            <div class="card-body p-0">
+              <div class="d-flex justify-content-between mb-1">
+                <strong>John Doe</strong>
+                <span class="price">$750</span>
+              </div>
+              <div class="mb-2">Toyota Land Cruiser</div>
+              <div class="d-flex text-muted">
+                <div class="me-3" data-bs-toggle="modal" data-bs-target="#calendarModal">
+                  <i class="bi bi-calendar icon"></i>2025-03-15
+                </div>
+                <div data-bs-toggle="modal" data-bs-target="#clockModal">
+                  <i class="bi bi-clock icon"></i>2025-03-20
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Modal -->
+  <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="calendarModalLabel">Start Date</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="date" class="form-control">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clock Modal -->
+  <div class="modal fade" id="clockModal" tabindex="-1" aria-labelledby="clockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="clockModalLabel">End Date</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="date" class="form-control">
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <!-- Car Details Section -->
+<div id="carDetailsSection" style="display: none;">
+  <h4>Car Details</h4>
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Car information</th>
+          <th>Owner Name</th>
+          <th>Contact No</th>
+          <th>Status</th>
+          <th>Mileage</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  <tr>
+    <td>Mercedes Benz, ABC123</td>
+    <td>John Adams</td>
+    <td>213626583574</td>
+    <td><span class="status-available">Available</span></td>
+    <td>15km</td>
+    <td class="action-links">
+      <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#viewModal">View</a>
+      <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#updateModal">Update</a>
+      <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="confirmDelete('Mercedes Benz, ABC123')">Delete</a>
+    </td>
+    
+
+  </tr>
+  <tr>
+    <td>Chevrolet Camaro, ABC123</td>
+     <td>Emily Brown</td>
+    <td>584538989798</td>
+    <td><span class="status-rented">Rented</span></td>
+    <td>20km</td>
+    <td class="action-links">
+      <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#viewModal">View</a>
+      <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#updateModal">Update</a>
+      <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="confirmDelete('Chevrolet Camaro, ABC123')">Delete</a>
+    </td>
+  </tr>
+  <tr>
+    <td>Audi Q3 SUV, ABC123</td>
+    <td>Jessica Haris</td>
+    <td>93590646678476</td>
+    <td><span class="status-available">Available</span></td>
+     <td>25km</td>
+    <td class="action-links">
+      <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#viewModal">View</a>
+      <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#updateModal">Update</a>
+      <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="confirmDelete('Audi Q3 SUV, ABC123')">Delete</a>
+    </td>
+  </tr>
+  <tr>
+    <td>Toyota Land Cruiser, ABC123</td>
+        <td>James Evans</td>
+    <td>357348673597</td>
+   <td><span class="status-maintenance">Maintenance</span></td>
+    <td>10km</td>
+    <td class="action-links">
+      <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#viewModal">View</a>
+      <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#updateModal">Update</a>
+      <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="confirmDelete('Toyota Land Cruiser, ABC123')">Delete</a>
+    </td>
+  </tr>
+  <tr>
+    <td>Hyundai Tucson, ABC123</td>
+    <td>Robert Gray</td>
+    <td>53756876826826</td>
+    <td><span class="status-rented">Rented</span></td>
+    <td>20km</td>
+    <td class="action-links">
+      <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#viewModal">View</a>
+      <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#updateModal">Update</a>
+      <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="confirmDelete('Hyundai Tucson, ABC123')">Delete</a>
+    </td>
+  </tr>
+  <tr>
+    <td>Range Rover, ABC123</td>
+    <td>Michale Clark</td>
+    <td>8246856986628</td>
+    <td><span class="status-maintenance">Maintenance</span></td>
+    <td>15km</td>
+    <td class="action-links">
+      <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#viewModal">View</a>
+      <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#updateModal">Update</a>
+      <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="confirmDelete('Range Rover, ABC123')">Delete</a>
+    </td>
+  </tr>
+</tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap JS and Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Chart JS -->
+<script>
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      datasets: [{
+        label: 'Cars',
+        data: [4000, 3000, 2000, 2500, 1900, 2400, 3200],
+        fill: true,
+        backgroundColor: 'rgba(33, 93, 102, 0.2)',
+        borderColor: 'rgba(33, 93, 102, 1)',
+        tension: 0.4
+      }]
+    },
+    options: {
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `${context.raw} Cars`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
