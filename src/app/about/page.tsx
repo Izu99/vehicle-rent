@@ -1,424 +1,318 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { useState } from "react"
-import { motion, Variants } from "framer-motion"
-import { 
-  Star,
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { motion, Variants } from "framer-motion";
+import {
   Users,
-  Award,
-  Shield,
   Car,
-  Globe,
-  Heart,
-  Target,
+  Shield,
+  Award,
   CheckCircle,
-  Quote
-} from "lucide-react"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+  Globe,
+  Target,
+  Star,
+  Building,
+  TrendingUp,
+  UserCheck,
+  MapPin,
+  Handshake,
+  Heart,
+} from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { useState } from "react";
 
 export default function AboutPage() {
-  const [loginOpen, setLoginOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  }
+      transition: { staggerChildren: 0.1 },
+    },
+  };
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }
-    }
-  }
-
-  const stats = [
-    { icon: <Car className="w-8 h-8" />, number: "500+", label: "Premium Vehicles" },
-    { icon: <Users className="w-8 h-8" />, number: "50+", label: "Trusted Partners" },
-    { icon: <Star className="w-8 h-8" />, number: "4.9", label: "Average Rating" },
-    { icon: <Globe className="w-8 h-8" />, number: "25+", label: "Cities Covered" }
-  ]
-
-  const team = [
-    {
-      name: "Samantha Fernando",
-      role: "CEO & Founder",
-      image: "team1.jpg",
-      bio: "15+ years in automotive industry with passion for customer service excellence."
+      transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] },
     },
-    {
-      name: "Rajesh Kumar",
-      role: "CTO",
-      image: "team2.jpg", 
-      bio: "Tech expert specializing in marketplace platforms and customer experience."
-    },
-    {
-      name: "Priya Jayawardena",
-      role: "Head of Operations",
-      image: "team3.jpg",
-      bio: "Operations specialist ensuring seamless rental experiences across Sri Lanka."
-    },
-    {
-      name: "Michael Silva",
-      role: "Head of Partnerships",
-      image: "team4.jpg",
-      bio: "Building strong relationships with rental companies nationwide."
-    }
-  ]
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Business Traveler",
-      image: "customer1.jpg",
-      rating: 5,
-      comment: "Skyline made my business trip to Colombo seamless. Great cars, better prices!"
-    },
-    {
-      name: "David Chen",
-      role: "Tourist",
-      image: "customer2.jpg", 
-      rating: 5,
-      comment: "Perfect platform for comparing rental options. Saved both time and money!"
-    },
-    {
-      name: "Amara Perera",
-      role: "Local Customer",
-      image: "customer3.jpg",
-      rating: 5,
-      comment: "Reliable service with transparent pricing. My go-to platform for car rentals."
-    }
-  ]
+  };
 
   return (
     <div className="min-h-screen gradient-background text-gray-900">
+      {/* Navbar */}
       <Navbar onLoginClick={() => setLoginOpen(true)} />
-      
+
       {/* Hero Section */}
-      <section className="py-20 gradient-dark relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="relative overflow-hidden h-[60vh] min-h-[400px]">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://plus.unsplash.com/premium_photo-1686730540270-93f2c33351b6?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+          }}
+        />
+        <div className="absolute inset-0 gradient-hero" />
+
+        <div className="relative h-full flex items-center justify-center px-4">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center text-white"
+            transition={{ duration: 1, ease: [0.6, -0.05, 0.01, 0.99] }}
+            className="text-center max-w-4xl w-full"
           >
-            <Badge className="bg-primary/20 text-primary px-4 py-2 text-sm font-medium mb-6">
+            <Badge className="bg-primary/20 text-primary px-6 py-3 text-sm font-medium mb-6 backdrop-blur-sm">
               🚗 About Skyline
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Connecting You with the <span className="text-primary">Best Rides</span>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              Connecting You to
+              <span className="text-primary ml-2">Premium Rentals</span>
             </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              We&apos;re Sri Lanka&apos;s premier car rental marketplace, bringing together trusted 
-              rental companies and customers for seamless, affordable transportation solutions.
+
+            <p className="text-gray-200 text-lg sm:text-xl max-w-3xl mx-auto opacity-90 leading-relaxed">
+              Sri Lanka&apos;s premier car rental marketplace, bringing together trusted rental companies and customers for seamless mobility solutions
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
+      {/* About Us Section */}
+      <motion.section
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="py-16 gradient-background"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-4 gap-8"
-          >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className="text-center"
-              >
-                <div className="text-primary mb-4 flex justify-center">
-                  {stat.icon}
-                </div>
-                <div className="text-3xl font-bold text-gray-900 mb-2">{stat.number}</div>
-                <div className="text-gray-600">{stat.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Our Story Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <Badge className="bg-primary-light text-primary px-4 py-2 text-sm font-medium mb-4">
-                Our Story
-              </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Making Car Rental <span className="text-primary">Simple & Reliable</span>
-              </h2>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Founded in 2020, Skyline began with a simple mission: to revolutionize how people 
-                find and book rental cars in Sri Lanka. We noticed the challenges customers faced 
-                in comparing prices, finding reliable vehicles, and dealing with fragmented booking systems.
-              </p>
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                Today, we&apos;ve partnered with over 50 trusted rental companies across 25+ cities, 
-                creating a one-stop platform where customers can compare, book, and manage their 
-                rental experiences with complete confidence.
-              </p>
-              
-              <div className="space-y-4">
-                {[
-                  "Transparent pricing with no hidden fees",
-                  "Verified rental partners only",
-                  "24/7 customer support",
-                  "Instant booking confirmation"
-                ].map((feature, idx) => (
-                  <div key={idx} className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span className="text-gray-700">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <Image
-                src="/images/about-story.jpg"
-                alt="Our Story"
-                width={600}
-                height={400}
-                className="rounded-xl shadow-2xl"
-              />
-              <div className="absolute -bottom-6 -left-6 bg-primary text-black p-6 rounded-xl shadow-lg">
-                <div className="text-2xl font-bold">2020</div>
-                <div className="text-sm">Founded</div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission & Vision */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Our Mission & <span className="text-primary">Vision</span>
-            </h2>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <Card className="h-full border-0 shadow-xl">
-                <CardContent className="p-8 text-center">
-                  <div className="text-primary mb-4">
-                    <Target className="w-12 h-12 mx-auto" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    To democratize car rentals by providing a transparent, reliable platform 
-                    that connects customers with the best rental options, ensuring everyone 
-                    has access to quality transportation at fair prices.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <Card className="h-full border-0 shadow-xl">
-                <CardContent className="p-8 text-center">
-                  <div className="text-primary mb-4">
-                    <Heart className="w-12 h-12 mx-auto" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Vision</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    To become the most trusted car rental marketplace in South Asia, 
-                    known for innovation, customer satisfaction, and contributing to 
-                    sustainable tourism and transportation solutions.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
+          <motion.div variants={itemVariants} className="text-center mb-16">
             <Badge className="bg-primary-light text-primary px-4 py-2 text-sm font-medium mb-4">
-              Meet Our Team
+              🎯 Our Story
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              The People Behind <span className="text-primary">Skyline</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+              Revolutionizing <span className="text-primary">Car Rentals</span> in Sri Lanka
             </h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Our passionate team is dedicated to revolutionizing the car rental experience
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
+              Skyline is more than just a car rental platform - we&apos;re a comprehensive marketplace that connects customers with verified rental companies across Sri Lanka, making car rentals accessible, transparent, and hassle-free.
             </p>
           </motion.div>
-          
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-          >
-            {team.map((member, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-                  <CardContent className="p-6 text-center">
-                    <div className="relative mb-4">
-                      <Image
-                        src={`/images/${member.image}`}
-                        alt={member.name}
-                        width={150}
-                        height={150}
-                        className="rounded-full mx-auto group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <h3 className="font-bold text-xl text-gray-900 mb-1">{member.name}</h3>
-                    <p className="text-primary font-medium mb-3">{member.role}</p>
-                    <p className="text-gray-600 text-sm leading-relaxed">{member.bio}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
 
-      {/* Customer Testimonials */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              What Our <span className="text-primary">Customers Say</span>
-            </h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Real feedback from real customers who trust Skyline for their rental needs
-            </p>
-          </motion.div>
-          
+          {/* Mission & Vision Cards */}
           <motion.div
             variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16"
           >
-            {testimonials.map((testimonial, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                <Card className="border-0 shadow-xl h-full">
-                  <CardContent className="p-6">
-                    <div className="flex items-center mb-4">
-                      <Image
-                        src={`/images/${testimonial.image}`}
-                        alt={testimonial.name}
-                        width={50}
-                        height={50}
-                        className="rounded-full mr-4"
-                      />
-                      <div>
-                        <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
-                        <p className="text-gray-600 text-sm">{testimonial.role}</p>
+            <motion.div variants={itemVariants}>
+              <Card className="h-full border-0 shadow-xl bg-white hover:shadow-2xl transition-all duration-300">
+                <CardContent className="p-8">
+                  <div className="flex items-center mb-6">
+                    <div className="bg-primary/10 p-3 rounded-full mr-4">
+                      <Target className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
+                  </div>
+                  <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                    To create a unified platform where customers can easily discover, compare, and book rental cars from trusted companies across Sri Lanka, while helping rental businesses reach more customers and grow their operations.
+                  </p>
+                  <div className="space-y-3">
+                    {[
+                      "Simplify car rental booking process",
+                      "Connect customers with verified partners",
+                      "Provide transparent pricing and reviews",
+                      "Support local rental businesses"
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center space-x-3">
+                        <CheckCircle className="w-5 h-5 text-accent flex-shrink-0" />
+                        <span className="text-gray-700">{item}</span>
                       </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Card className="h-full border-0 shadow-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:shadow-2xl transition-all duration-300">
+                <CardContent className="p-8">
+                  <div className="flex items-center mb-6">
+                    <div className="bg-accent/20 p-3 rounded-full mr-4">
+                      <Globe className="w-8 h-8 text-accent" />
                     </div>
-                    
-                    <div className="flex items-center mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      ))}
+                    <h3 className="text-2xl font-bold text-gray-900">Our Vision</h3>
+                  </div>
+                  <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                    To become Sri Lanka&apos;s most trusted and comprehensive car rental marketplace, setting new standards for convenience, reliability, and customer satisfaction in the mobility industry.
+                  </p>
+                  <div className="space-y-3">
+                    {[
+                      "Market leader in car rental marketplace",
+                      "Technology-driven customer experience",
+                      "Sustainable mobility solutions",
+                      "Island-wide coverage and accessibility"
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center space-x-3">
+                        <Star className="w-5 h-5 text-primary flex-shrink-0" />
+                        <span className="text-gray-700">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+
+          {/* How It Works */}
+          <motion.div variants={itemVariants} className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              How <span className="text-primary">Skyline</span> Works
+            </h3>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Our platform connects you with the best rental options in three simple steps
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={containerVariants}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
+          >
+            {[
+              {
+                icon: MapPin,
+                step: "01",
+                title: "Search by Location",
+                desc: "Enter your location, dates, and preferences to find available rental cars in your area",
+                color: "text-primary"
+              },
+              {
+                icon: Car,
+                step: "02",
+                title: "Compare Options",
+                desc: "Browse through verified rental companies, compare prices, read reviews, and select your perfect match",
+                color: "text-accent"
+              },
+              {
+                icon: Handshake,
+                step: "03",
+                title: "Book & Enjoy",
+                desc: "Contact the rental company directly or book through our platform and enjoy your hassle-free journey",
+                color: "text-primary"
+              }
+            ].map((step, i) => (
+              <motion.div key={i} variants={itemVariants} className="relative">
+                <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
+                  <CardContent className="p-8">
+                    <div className="relative mb-6">
+                      <div className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4`}>
+                        <step.icon className={`w-8 h-8 ${step.color}`} />
+                      </div>
+                      <Badge className="absolute -top-2 -right-2 bg-gray-900 text-white px-3 py-1 font-bold">
+                        {step.step}
+                      </Badge>
                     </div>
-                    
-                    <Quote className="w-6 h-6 text-primary mb-2" />
-                    <p className="text-gray-700 leading-relaxed">{testimonial.comment}</p>
+                    <h4 className="text-xl font-bold text-gray-900 mb-4">{step.title}</h4>
+                    <p className="text-gray-600 leading-relaxed">{step.desc}</p>
+                  </CardContent>
+                </Card>
+                {i < 2 && (
+                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+                    <div className="w-8 h-0.5 bg-gradient-to-r from-primary to-accent"></div>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Stats Section */}
+          <motion.div
+            variants={containerVariants}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
+          >
+            {[
+              { icon: Building, number: "50+", label: "Partner Companies", color: "text-primary" },
+              { icon: Car, number: "500+", label: "Available Vehicles", color: "text-accent" },
+              { icon: Users, number: "10K+", label: "Happy Customers", color: "text-primary" },
+              { icon: TrendingUp, number: "95%", label: "Satisfaction Rate", color: "text-accent" }
+            ].map((stat, i) => (
+              <motion.div key={i} variants={itemVariants}>
+                <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
+                  <CardContent className="p-6">
+                    <stat.icon className={`w-8 h-8 ${stat.color} mx-auto mb-4`} />
+                    <div className="text-3xl font-bold text-gray-900 mb-2">{stat.number}</div>
+                    <div className="text-gray-600 text-sm font-medium">{stat.label}</div>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </motion.div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* CTA Section */}
-      <section className="py-16 gradient-primary">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
-              Ready to Experience <span className="text-white">Skyline?</span>
-            </h2>
-            <p className="text-black/80 text-lg mb-8">
-              Join thousands of satisfied customers and start your journey today
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-black hover:bg-gray-800 text-white font-bold px-8 py-3 text-lg">
-                Browse Cars
-              </Button>
-              <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white font-bold px-8 py-3 text-lg">
-                Contact Us
-              </Button>
-            </div>
-          </motion.div>
+      {/* Partnership CTA */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+        className="py-16 gradient-primary relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center">
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl lg:text-5xl font-bold text-black mb-6">
+                Ready to <span className="text-white">Join Our Network?</span>
+              </h2>
+              <p className="text-black/80 text-lg mb-8 max-w-2xl mx-auto">
+                Partner with Skyline and expand your car rental business reach across Sri Lanka. Join our growing network of trusted rental companies.
+              </p>
+              <div className="flex flex-wrap gap-6 justify-center mb-8">
+                <div className="flex items-center space-x-2 text-black">
+                  <Shield className="w-5 h-5" />
+                  <span className="font-medium">Verified Platform</span>
+                </div>
+                <div className="flex items-center space-x-2 text-black">
+                  <TrendingUp className="w-5 h-5" />
+                  <span className="font-medium">Grow Your Business</span>
+                </div>
+                <div className="flex items-center space-x-2 text-black">
+                  <Heart className="w-5 h-5" />
+                  <span className="font-medium">Trusted Community</span>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  size="lg"
+                  className="bg-black hover:bg-gray-800 text-white font-bold px-8 py-4 text-lg shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
+                  🤝 Become a Partner
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-black text-black hover:bg-black hover:text-white font-bold px-8 py-4 text-lg"
+                >
+                  📞 Contact Us
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         </div>
-      </section>
+      </motion.section>
 
+      {/* Footer */}
       <Footer />
     </div>
-  )
+  );
 }

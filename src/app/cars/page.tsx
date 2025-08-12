@@ -240,7 +240,11 @@ export default function CarsPage() {
       <Navbar onLoginClick={() => setLoginOpen(true)} />
       
       {/* Page Header */}
-      <section className="py-16 gradient-dark">
+      <section className="py-40 bg-cover bg-center bg-no-repeat gradient-dark"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1666520629801-7f21614bedd7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+        }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

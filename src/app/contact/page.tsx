@@ -1,411 +1,350 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { useState } from "react"
-import { motion, Variants } from "framer-motion"
-import { 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { motion, Variants } from "framer-motion";
+import {
+  MapPin,
   Phone,
   Mail,
-  MapPin,
   Clock,
+  MessageSquare,
   Send,
-  MessageCircle,
-  Headphones,
-  Users,
-  CheckCircle
-} from "lucide-react"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+  UserCheck,
+  Shield,
+  Heart,
+  TrendingUp,
+} from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { useState } from "react";
 
 export default function ContactPage() {
-  const [loginOpen, setLoginOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  })
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+    inquiryType: "general",
+  });
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  }
+      transition: { staggerChildren: 0.1 },
+    },
+  };
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }
-    }
-  }
+      transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] },
+    },
+  };
 
-  // Use small icons from Unsplash — you can swap URLs with your favorites
-  const contactInfo = [
-    {
-      icon: (
-        <Image
-          src="https://images.unsplash.com/photo-1517433456452-f9633a875f6f?auto=format&fit=crop&w=32&q=80"
-          alt="Phone Icon"
-          width={24}
-          height={24}
-          className="inline-block"
-        />
-      ),
-      title: "Call Us",
-      details: ["+94 11 234 5678", "+94 77 123 4567"],
-      description: "Monday - Sunday: 6:00 AM - 10:00 PM"
-    },
-    {
-      icon: (
-        <Image
-          src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=32&q=80"
-          alt="Mail Icon"
-          width={24}
-          height={24}
-          className="inline-block"
-        />
-      ),
-      title: "Email Us", 
-      details: ["info@skyline.lk", "support@skyline.lk"],
-      description: "We'll respond within 2 hours"
-    },
-    {
-      icon: (
-        <Image
-          src="https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?auto=format&fit=crop&w=32&q=80"
-          alt="Map Pin Icon"
-          width={24}
-          height={24}
-          className="inline-block"
-        />
-      ),
-      title: "Visit Us",
-      details: ["123 Galle Road", "Colombo 03, Sri Lanka"],
-      description: "Monday - Friday: 9:00 AM - 6:00 PM"
-    },
-    {
-      icon: (
-        <Image
-          src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=32&q=80"
-          alt="Live Chat Icon"
-          width={24}
-          height={24}
-          className="inline-block"
-        />
-      ),
-      title: "Live Chat",
-      details: ["24/7 Support", "Instant Response"],
-      description: "Click the chat icon below"
-    }
-  ]
-
-  const faqs = [
-    {
-      question: "How do I book a car?",
-      answer: "Simply search for cars in your desired location, compare options, and click 'Book Now' on your preferred vehicle."
-    },
-    {
-      question: "What documents do I need?",
-      answer: "You'll need a valid driving license, national ID/passport, and a credit card for security deposit."
-    },
-    {
-      question: "Can I cancel my booking?",
-      answer: "Yes, you can cancel up to 24 hours before pickup for a full refund. Check individual rental terms for specific policies."
-    },
-    {
-      question: "Are there any hidden fees?",
-      answer: "No, we believe in transparent pricing. All fees are clearly displayed during the booking process."
-    }
-  ]
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Form submitted:', formData)
-  }
+    e.preventDefault();
+    console.log("Form submitted:", formData);
+    // Handle form submission here
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white text-gray-900">
+    <div className="min-h-screen gradient-background text-gray-900">
+      {/* Navbar */}
       <Navbar onLoginClick={() => setLoginOpen(true)} />
-      
+
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-50" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="relative overflow-hidden h-[50vh] min-h-[300px]">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://plus.unsplash.com/premium_photo-1737623478597-a060bb092f53?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+          }}
+        />
+        <div className="absolute inset-0 gradient-hero" />
+
+        <div className="relative h-full flex items-center justify-center px-4">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center text-white max-w-3xl mx-auto"
+            transition={{ duration: 1, ease: [0.6, -0.05, 0.01, 0.99] }}
+            className="text-center max-w-4xl w-full"
           >
-            <Badge className="bg-indigo-500/30 text-indigo-200 px-4 py-2 text-sm font-semibold mb-6 inline-flex items-center justify-center rounded-full tracking-wide">
-              📞 Get in Touch
+            <Badge className="bg-primary/20 text-primary px-6 py-3 text-sm font-medium mb-6 backdrop-blur-sm">
+              📞 Get In Touch
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-              We&apos;re Here to <span className="text-pink-400">Help You</span>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              Contact
+              <span className="text-primary ml-2">Skyline</span>
             </h1>
-            <p className="text-xl text-indigo-200 leading-relaxed">
-              Have questions about our service? Need help with a booking? Our friendly team 
-              is available 24/7 to assist you with anything you need.
+
+            <p className="text-gray-200 text-lg sm:text-xl max-w-2xl mx-auto opacity-90 leading-relaxed">
+              Have questions? Need support? Want to partner with us? We&apos;re here to help you every step of the way!
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Contact Info Cards */}
-      <section className="py-16 bg-white">
+      {/* Contact Section */}
+      <motion.section
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="py-16 gradient-background"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
-          >
-            {contactInfo.map((info, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                <Card className="border-0 shadow-lg hover:shadow-2xl transition-transform duration-300 h-full group">
-                  <CardContent className="p-6 text-center">
-                    <div className="mb-4 inline-block text-primary group-hover:scale-110 transition-transform duration-300">
-                      {info.icon}
-                    </div>
-                    <h3 className="font-bold text-xl mb-3">{info.title}</h3>
-                    <div className="space-y-1 mb-3">
-                      {info.details.map((detail, idx) => (
-                        <p key={idx} className="text-gray-700 font-medium">{detail}</p>
-                      ))}
-                    </div>
-                    <p className="text-gray-600 text-sm">{info.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Contact Information */}
+            <motion.div variants={itemVariants} className="space-y-8">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Let&apos;s Start a Conversation</h2>
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Whether you&apos;re a customer looking for the perfect rental or a business wanting to join our marketplace, we&apos;d love to hear from you.
+                </p>
+              </div>
+              
+              <div className="space-y-6">
+                {[
+                  {
+                    icon: MapPin,
+                    title: "Our Location",
+                    details: ["123 Galle Road, Colombo 03", "Western Province, Sri Lanka"],
+                    color: "text-primary"
+                  },
+                  {
+                    icon: Phone,
+                    title: "Phone Numbers",
+                    details: ["+94 11 234 5678", "+94 77 123 4567"],
+                    color: "text-accent"
+                  },
+                  {
+                    icon: Mail,
+                    title: "Email Addresses",
+                    details: ["info@skyline.lk", "support@skyline.lk"],
+                    color: "text-primary"
+                  },
+                  // {
+                  //   icon: Clock,
+                  //   title: "Business Hours",
+                  //   details: ["Monday - Friday: 8:00 AM - 8:00 PM", "Saturday - Sunday: 9:00 AM - 6:00 PM"],
+                  //   color: "text-accent"
+                  // }
+                ].map((contact, i) => (
+                  <Card key={i} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-gray-100 p-3 rounded-full">
+                          <contact.icon className={`w-6 h-6 ${contact.color}`} />
+                        </div>
+                        <div>
+                          <h4 className="text-gray-900 font-semibold mb-2">{contact.title}</h4>
+                          {contact.details.map((detail, j) => (
+                            <p key={j} className="text-gray-600">{detail}</p>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
-      {/* Contact Form & Map */}
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-8">
-                <h2 className="text-3xl font-bold mb-6">
-                  Send us a <span className="text-pink-500">Message</span>
-                </h2>
-                
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Full Name *
-                      </label>
-                      <Input
-                        placeholder="Enter your full name"
-                        className="input-primary"
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Email Address *
-                      </label>
-                      <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="input-primary"
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Subject *
-                    </label>
-                    <select 
-                      className="select-primary"
-                      value={formData.subject}
-                      onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                      required
+              {/* Quick Contact Options */}
+              {/* <Card className="border-0 shadow-lg bg-gradient-to-br from-primary/5 to-accent/5">
+                <CardContent className="p-6">
+                  <h4 className="text-gray-900 font-semibold mb-4">Quick Actions</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Button className="gradient-primary gradient-primary-hover text-black font-semibold flex items-center space-x-2">
+                      <UserCheck className="w-4 h-4" />
+                      <span>Become a Partner</span>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="border-primary text-primary hover:bg-primary hover:text-black flex items-center space-x-2"
                     >
-                      <option value="">Select a subject</option>
-                      <option value="booking">Booking Inquiry</option>
-                      <option value="support">Technical Support</option>
-                      <option value="partnership">Partnership</option>
-                      <option value="feedback">Feedback</option>
-                      <option value="other">Other</option>
-                    </select>
+                      <MessageSquare className="w-4 h-4" />
+                      <span>Live Chat</span>
+                    </Button>
                   </div>
+                </CardContent>
+              </Card> */}
+            </motion.div>
+
+            {/* Contact Form */}
+            <motion.div variants={itemVariants}>
+              <Card className="border-0 shadow-xl bg-white">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h3>
                   
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Message *
-                    </label>
-                    <Textarea
-                      placeholder="Tell us how we can help you..."
-                      rows={6}
-                      className="input-primary resize-none"
-                      value={formData.message}
-                      onChange={(e) => setFormData({...formData, message: e.target.value})}
-                      required
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit"
-                    className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 text-lg flex justify-center items-center gap-2"
-                  >
-                    <Send className="w-5 h-5" />
-                    Send Message
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </motion.div>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
+                        <Input
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          placeholder="Your full name"
+                          className="input-primary"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-2">Phone Number</label>
+                        <Input
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          placeholder="+94 XX XXX XXXX"
+                          className="input-primary"
+                        />
+                      </div>
+                    </div>
 
-          {/* Map & Additional Info */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="space-y-8"
-          >
-            {/* Map Image */}
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-0">
-                <Image
-                  src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
-                  alt="Map Location"
-                  width={800}
-                  height={300}
-                  className="rounded-lg object-cover w-full h-[300px]"
-                  priority
-                />
-                <div className="p-4 text-center">
-                  <MapPin className="w-12 h-12 text-pink-500 mx-auto mb-4" />
-                  <p className="text-gray-700 font-semibold">123 Galle Road, Colombo 03</p>
-                </div>
-              </CardContent>
-            </Card>
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">Email Address</label>
+                      <Input
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="your@email.com"
+                        className="input-primary"
+                        required
+                      />
+                    </div>
 
-            {/* Business Hours */}
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-xl mb-4 flex items-center gap-2 text-gray-900">
-                  <Clock className="w-5 h-5 text-pink-500" />
-                  Business Hours
-                </h3>
-                <div className="space-y-2 text-gray-700 font-medium">
-                  <div className="flex justify-between">
-                    <span>Monday - Friday</span>
-                    <span>9:00 AM - 6:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Saturday</span>
-                    <span>9:00 AM - 4:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Sunday</span>
-                    <span>10:00 AM - 2:00 PM</span>
-                  </div>
-                  <hr className="my-3" />
-                  <div className="flex justify-between text-green-600 font-semibold">
-                    <span>24/7 Support</span>
-                    <span>Always Available</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">Inquiry Type</label>
+                      <select
+                        name="inquiryType"
+                        value={formData.inquiryType}
+                        onChange={handleInputChange}
+                        className="select-primary"
+                      >
+                        <option value="general">General Inquiry</option>
+                        <option value="support">Customer Support</option>
+                        <option value="partnership">Partnership</option>
+                        <option value="feedback">Feedback</option>
+                        <option value="business">Business Inquiry</option>
+                      </select>
+                    </div>
 
-            {/* Support Features */}
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-xl mb-4 flex items-center gap-2 text-gray-900">
-                  <Headphones className="w-5 h-5 text-pink-500" />
-                  Support Features
-                </h3>
-                <ul className="space-y-3 text-gray-700 font-medium list-disc list-inside">
-                  {[
-                    "24/7 customer support",
-                    "Multi-language assistance", 
-                    "Emergency roadside help",
-                    "Live chat support",
-                    "Email & phone support",
-                    "Video call assistance"
-                  ].map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </motion.div>
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">Subject</label>
+                      <Input
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleInputChange}
+                        placeholder="What's this about?"
+                        className="input-primary"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">Message</label>
+                      <Textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        placeholder="Tell us more about your inquiry..."
+                        rows={5}
+                        className="resize-none rounded-lg border border-gray-300 p-3 w-full focus:border-primary focus:ring-1 focus:ring-primary"
+                        required
+                      />
+                    </div>
+
+                    <Button 
+                      type="submit"
+                      className="w-full gradient-primary gradient-primary-hover text-black font-semibold py-3 flex items-center justify-center space-x-2"
+                    >
+                      <Send className="w-5 h-5" />
+                      <span>Send Message</span>
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* FAQ Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
-              Frequently Asked <span className="text-pink-500">Questions</span>
-            </h2>
-            <p className="text-gray-600 text-lg">
-              Quick answers to the most common questions about our service
-            </p>
-          </motion.div>
-          
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="space-y-6"
-          >
-            {faqs.map((faq, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                <Card className="border-0 shadow-lg">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-3 text-gray-900">{faq.question}</h3>
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
+      {/* Partnership CTA */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+        className="py-16 gradient-primary relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center">
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl lg:text-5xl font-bold text-black mb-6">
+                Ready to <span className="text-white">Get Started?</span>
+              </h2>
+              <p className="text-black/80 text-lg mb-8 max-w-2xl mx-auto">
+                Join thousands of satisfied customers or become a trusted partner in our growing marketplace ecosystem.
+              </p>
+              <div className="flex flex-wrap gap-6 justify-center mb-8">
+                <div className="flex items-center space-x-2 text-black">
+                  <Shield className="w-5 h-5" />
+                  <span className="font-medium">Trusted Platform</span>
+                </div>
+                <div className="flex items-center space-x-2 text-black">
+                  <TrendingUp className="w-5 h-5" />
+                  <span className="font-medium">Fast Response</span>
+                </div>
+                <div className="flex items-center space-x-2 text-black">
+                  <Heart className="w-5 h-5" />
+                  <span className="font-medium">Customer First</span>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  size="lg"
+                  className="bg-black hover:bg-gray-800 text-white font-bold px-8 py-4 text-lg shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
+                  🚗 Start Booking
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-black text-black hover:bg-black hover:text-white font-bold px-8 py-4 text-lg"
+                >
+                  📞 Call Us Now
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         </div>
-      </section>
+      </motion.section>
 
+      {/* Footer */}
       <Footer />
     </div>
-  )
+  );
 }

@@ -62,7 +62,7 @@ export default function HomePage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
+              "url('https://images.unsplash.com/photo-1684323674292-825832273d27?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
           }}
         />
         <div className="absolute inset-0 gradient-hero" />
@@ -104,11 +104,11 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="bg-white/80 backdrop-blur rounded-2xl p-6 sm:p-8 shadow-2xl max-w-4xl mx-auto"
+              className="bg-white/40 backdrop-blur rounded-2xl p-6 sm:p-8 shadow-2xl max-w-4xl mx-auto"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 flex items-center">
+                  <label className="text-sm font-medium text-black flex items-center">
                     <MapPin className="w-4 h-4 mr-1" />
                     Pick-up Location
                   </label>
@@ -121,7 +121,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-black">
                     District
                   </label>
                   <select className="select-primary">
@@ -133,7 +133,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-black">
                     Car Type
                   </label>
                   <select className="select-primary">
@@ -145,7 +145,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-black">
                     Budget
                   </label>
                   <select className="select-primary">
@@ -162,7 +162,7 @@ export default function HomePage() {
                 <span>Search Available Cars</span>
               </Button>
 
-              <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-gray-600">
+              <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-black/80">
                 <div className="flex items-center space-x-1">
                   <Car className="w-4 h-4 text-accent" />
                   <span>500+ Cars Available</span>
