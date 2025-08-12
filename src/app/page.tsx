@@ -1,234 +1,498 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { useState } from "react"
-import { motion } from "framer-motion"
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react";
+import { motion, Variants } from "framer-motion";
+import {
+  Star,
+  MapPin,
+  Search,
+  Car,
+  Users,
+  Shield,
+  Award,
+  Phone,
+  Mail,
+  Clock,
+  CheckCircle,
+} from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function HomePage() {
-  const [loginOpen, setLoginOpen] = useState(false)
-  const [bookOpen, setBookOpen] = useState(false)
-  const [topServiceOpen, setTopServiceOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [bookOpen, setBookOpen] = useState(false);
+  const [topServiceOpen, setTopServiceOpen] = useState(false);
+
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] },
+    },
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-gray-900">
+    <div className="min-h-screen gradient-background text-gray-900">
       {/* Navbar */}
-      <nav className="sticky top-0 bg-white shadow z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
-          <div className="flex items-center space-x-3 font-bold text-xl">
-            <Image src="/logo.png" alt="Logo" width={100} height={100} />
-            <span>SKYLINE</span>
-          </div>
-          <div className="flex items-center space-x-6">
-            <a href="#" className="font-semibold text-gray-700">Home</a>
-            <a href="#" className="hover:text-gray-500">About Us</a>
-            <a href="#" className="hover:text-gray-500">Contact Us</a>
-            <Button
-              className="bg-yellow-400 text-black hover:bg-yellow-300"
-              onClick={() => setLoginOpen(true)}
-            >
-              Login
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <Navbar onLoginClick={() => setLoginOpen(true)} />
 
       {/* Hero Section */}
-      <section
-        className="relative h-[500px] bg-cover bg-center text-white"
-        style={{ backgroundImage: "url('/images/background-image.jpg')" }}
-      >
-        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="mb-6">
-            <div className="bg-[#207e8e] text-white text-2xl font-bold px-8 py-4 rounded-lg max-w-[700px]">
-              Welcome to SKYLINE Car Rental
-            </div>
-          </h1>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-3/4">
-            <select className="border border-gray-300 text-black rounded px-3 py-2 bg-white">
-              <option>Province</option>
-              <option>Sabaragamuwa</option>
-              <option>Eastern</option>
-              <option>North</option>
-            </select>
-            <select className="border border-gray-300 text-black rounded px-3 py-2 bg-white">
-              <option>District</option>
-              <option>Ratnapura</option>
-              <option>Kegalle</option>
-              <option>Nuwara</option>
-            </select>
-            <Button className="bg-yellow-400 text-black hover:bg-yellow-300 w-full">
-              Search
-            </Button>
-          </div>
-        </div>
-      </section>
+      <section className="relative overflow-hidden h-screen">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
+          }}
+        />
+        <div className="absolute inset-0 gradient-hero" />
 
-      {/* Special Offers */}
-      <section className="py-12 text-center max-w-7xl mx-auto">
-        <h3 className="text-2xl font-bold">Special Offers</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
-          {[
-            { img: "ed3.png", title: "Elite Cars", desc: "Mercedes-Benz E-Class" },
-            { img: "ed4.png", title: "Revus Automotive", desc: "Toyota Land Cruiser" },
-            { img: "ed1.png", title: "Limo Service", desc: "Chevrolet Camaro" },
-            { img: "ed2.png", title: "Car Dealer", desc: "Audi Q3 Sportback SUV" },
-          ].map((offer, i) => (
+        <div className="relative h-full flex items-center justify-center px-4 py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.6, -0.05, 0.01, 0.99] }}
+            className="text-center max-w-5xl w-full"
+          >
+            {/* Compact Header */}
             <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.2 }}
-              className="bg-white rounded-lg shadow overflow-hidden"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="mb-8"
             >
-              <Image
-                src={`/images/${offer.img}`}
-                alt={offer.title}
-                width={300}
-                height={200}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h5 className="font-bold">{offer.title}</h5>
-                <p className="text-sm text-gray-600">{offer.desc}</p>
-                <Button className="bg-yellow-400 text-black mt-3 w-full font-semibold">
-                  Discover Offers
-                </Button>
+              <div className="inline-flex items-center space-x-2 bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
+                <Car className="w-4 h-4 text-primary" />
+                <span className="text-white text-sm font-medium">
+                  Premium Car Rental Marketplace
+                </span>
+              </div>
+
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
+                Find Your Perfect
+                <span className="text-primary ml-2">Rental Car</span>
+              </h1>
+
+              <p className="text-gray-200 text-sm sm:text-base max-w-2xl mx-auto opacity-90">
+                Compare prices from 50+ trusted rental companies across Sri
+                Lanka
+              </p>
+            </motion.div>
+
+            {/* Search Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="bg-white/80 backdrop-blur rounded-2xl p-6 sm:p-8 shadow-2xl max-w-4xl mx-auto"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 flex items-center">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    Pick-up Location
+                  </label>
+                  <select className="select-primary">
+                    <option>Select Province</option>
+                    <option>Western Province</option>
+                    <option>Central Province</option>
+                    <option>Southern Province</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    District
+                  </label>
+                  <select className="select-primary">
+                    <option>Select District</option>
+                    <option>Colombo</option>
+                    <option>Gampaha</option>
+                    <option>Kandy</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Car Type
+                  </label>
+                  <select className="select-primary">
+                    <option>Any Type</option>
+                    <option>Economy</option>
+                    <option>SUV</option>
+                    <option>Luxury</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Budget
+                  </label>
+                  <select className="select-primary">
+                    <option>Any Budget</option>
+                    <option>Under $50/day</option>
+                    <option>$50-100/day</option>
+                    <option>$100-200/day</option>
+                  </select>
+                </div>
+              </div>
+
+              <Button className="w-full gradient-primary gradient-primary-hover text-black font-bold py-4 text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all flex items-center justify-center space-x-2">
+                <Search className="w-5 h-5" />
+                <span>Search Available Cars</span>
+              </Button>
+
+              <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-gray-600">
+                <div className="flex items-center space-x-1">
+                  <Car className="w-4 h-4 text-accent" />
+                  <span>500+ Cars Available</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Users className="w-4 h-4 text-accent" />
+                  <span>50+ Trusted Companies</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Shield className="w-4 h-4 text-accent" />
+                  <span>Verified Partners</span>
+                </div>
               </div>
             </motion.div>
-          ))}
+          </motion.div>
         </div>
       </section>
 
-      {/* Top Services */}
-      <section className="py-12 text-center bg-gray-50">
-        <h3 className="text-2xl font-bold">Top Services Companies</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8 max-w-7xl mx-auto">
-          {[
-            { img: "da1.jfif", rating: "4.5", name: "NAB Rent A Car", modal: () => setTopServiceOpen(true) },
-            { img: "da2.jfif", rating: "4.2", name: "Global India Tours" },
-            { img: "da3.jfif", rating: "4.6", name: "Nanuan Travels" },
-            { img: "da4.jfif", rating: "4.8", name: "Premium Chauffeur" },
-          ].map((service, i) => (
+      {/* Featured Car Types */}
+      <motion.section
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="py-16 gradient-background"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <motion.div variants={itemVariants} className="text-center mb-12">
+            <Badge className="bg-primary-light text-primary px-4 py-2 text-sm font-medium mb-4">
+              🚗 Popular Categories
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Browse by <span className="text-primary">Vehicle Type</span>
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Find the perfect car for your journey from our diverse fleet
+              categories
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={containerVariants}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
+          >
+            {[
+              {
+                img: "ed3.png",
+                title: "Luxury Cars",
+                desc: "Premium vehicles for special occasions",
+                count: "45+ Available",
+                badge: "Premium",
+              },
+              {
+                img: "ed4.png",
+                title: "SUVs & 4WDs",
+                desc: "Perfect for family trips",
+                count: "120+ Available",
+                badge: "Popular",
+              },
+              {
+                img: "ed1.png",
+                title: "Sports Cars",
+                desc: "High-performance vehicles",
+                count: "25+ Available",
+                badge: "Exclusive",
+              },
+              {
+                img: "ed2.png",
+                title: "Economy Cars",
+                desc: "Budget-friendly options",
+                count: "200+ Available",
+                badge: "Budget",
+              },
+            ].map((category, i) => (
+              <motion.div
+                key={i}
+                variants={itemVariants}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="group cursor-pointer"
+              >
+                <Card className="overflow-hidden border-0 shadow-xl bg-white hover:shadow-2xl transition-all duration-300">
+                  <div className="relative overflow-hidden">
+                    <Image
+                      src={`/images/${category.img}`}
+                      alt={category.title}
+                      width={400}
+                      height={250}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <Badge className="absolute top-4 left-4 bg-accent text-black font-semibold">
+                      {category.badge}
+                    </Badge>
+                    <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-bold">
+                      {category.count}
+                    </div>
+                  </div>
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-xl text-gray-900 mb-2">
+                      {category.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4">{category.desc}</p>
+                    <Button className="w-full gradient-primary gradient-primary-hover text-black font-semibold">
+                      Browse {category.title}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Top Service Companies */}
+      <motion.section
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="py-16 gradient-dark"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <motion.div variants={itemVariants} className="text-center mb-12">
+            <Badge className="bg-primary/20 text-primary px-4 py-2 text-sm font-medium mb-4">
+              🏆 Top Rated Partners
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Trusted <span className="text-primary">Rental Companies</span>
+            </h2>
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+              Choose from our verified partner network of premium car rental
+              services
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={containerVariants}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
+          >
+            {[
+              {
+                img: "da1.jfif",
+                rating: "4.9",
+                name: "NAB Rent A Car",
+                reviews: "2.5K",
+                modal: () => setTopServiceOpen(true),
+              },
+              {
+                img: "da2.jfif",
+                rating: "4.8",
+                name: "Global India Tours",
+                reviews: "1.8K",
+              },
+              {
+                img: "da3.jfif",
+                rating: "4.9",
+                name: "Nanuan Travels",
+                reviews: "3.2K",
+              },
+              {
+                img: "da4.jfif",
+                rating: "4.8",
+                name: "Premium Chauffeur",
+                reviews: "2.1K",
+              },
+            ].map((service, i) => (
+              <motion.div
+                key={i}
+                variants={itemVariants}
+                whileHover={{ y: -10 }}
+                className="group"
+              >
+                <Card className="bg-gray-800 border-gray-700 hover:border-primary/50 transition-all duration-300 overflow-hidden">
+                  <div className="relative">
+                    <Image
+                      src={`/images/${service.img}`}
+                      alt={service.name}
+                      width={300}
+                      height={200}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 right-4 bg-accent text-black px-3 py-1 rounded-full flex items-center space-x-1">
+                      <Star className="w-4 h-4 fill-current" />
+                      <span className="font-bold">{service.rating}</span>
+                    </div>
+                  </div>
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-white text-lg mb-2">
+                      {service.name}
+                    </h3>
+                    <p className="text-gray-400 text-sm mb-4">
+                      {service.reviews} Reviews
+                    </p>
+                    <Button
+                      onClick={service.modal}
+                      className="w-full gradient-primary gradient-primary-hover text-black font-semibold"
+                    >
+                      View Details
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* CTA Section */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+        className="py-16 gradient-primary relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between">
             <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.2 }}
-              className="bg-white rounded-lg shadow overflow-hidden p-3"
+              initial={{ x: -100, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              className="flex items-center mb-8 lg:mb-0"
             >
               <Image
-                src={`/images/${service.img}`}
-                alt={service.name}
-                width={300}
-                height={200}
-                className="w-full h-48 object-cover rounded"
+                src="/logo.png"
+                alt="Skyline"
+                width={120}
+                height={120}
+                className="rounded-xl shadow-lg"
               />
-              <p className="font-bold mt-2">Rating: {service.rating}</p>
-              <p>{service.name}</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-center lg:text-left flex-1 lg:mx-12"
+            >
+              <h2 className="text-4xl lg:text-5xl font-bold text-black mb-4">
+                Ready for Your <span className="text-white">Dream Ride?</span>
+              </h2>
+              <p className="text-black/80 text-lg mb-6">
+                Join thousands of satisfied customers. Book your premium vehicle
+                today!
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+                <div className="flex items-center space-x-2 text-black">
+                  <Shield className="w-5 h-5" />
+                  <span className="font-medium">Insured</span>
+                </div>
+                <div className="flex items-center space-x-2 text-black">
+                  <Award className="w-5 h-5" />
+                  <span className="font-medium">Premium Quality</span>
+                </div>
+                <div className="flex items-center space-x-2 text-black">
+                  <Users className="w-5 h-5" />
+                  <span className="font-medium">24/7 Support</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ x: 100, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
               <Button
-                className="bg-yellow-400 text-black mt-3 font-semibold"
-                onClick={service.modal}
+                onClick={() => setBookOpen(true)}
+                size="lg"
+                className="bg-black hover:bg-gray-800 text-white font-bold px-8 py-4 text-lg shadow-xl transform hover:scale-105 transition-all duration-200"
               >
-                Visit site
+                🚗 Start Booking
               </Button>
             </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Banner */}
-      <div className="bg-[#2a8fa0] text-white py-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
-          <Image src="/logo.png" alt="Skyline" width={200} height={200} />
-          <div className="text-center md:text-left">
-            <h2 className="text-2xl font-bold">Best Deals Await You!</h2>
-            <p>Book now and enjoy the ride</p>
           </div>
-          <Button
-            className="bg-yellow-400 text-black mt-4 md:mt-0"
-            onClick={() => setBookOpen(true)}
-          >
-            Book Now
-          </Button>
         </div>
-      </div>
+      </motion.section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8">
-          {[
-            { title: "Pages", items: ["Rental", "Locations", "FAQ", "Features", "Blog"] },
-            { title: "Resources", items: ["Installation Manual", "Release Note", "Community Help"] },
-            { title: "Company", items: ["About Us", "Career", "Press", "Support"] },
-            { title: "Product", items: ["Demo", "Security", "FAQ", "Features"] },
-          ].map((col, i) => (
-            <div key={i}>
-              <h5 className="font-bold mb-3">{col.title}</h5>
-              <ul className="space-y-1 text-gray-300 text-sm">
-                {col.items.map((item, idx) => <li key={idx}>{item}</li>)}
-              </ul>
-            </div>
-          ))}
-          <div>
-            <Image src="/logo.png" alt="Skyline Logo" width={150} height={100} />
-            <p className="mt-3">Stay up to date on all the latest news.</p>
-            <p className="mt-2 font-bold">Follow us:</p>
-            <div className="flex space-x-3 mt-2">
-              <Image src="/images/f1.png" alt="Facebook" width={30} height={30} />
-              <Image src="/images/t2.png" alt="Twitter" width={30} height={30} />
-              <Image src="/images/i1.png" alt="Instagram" width={30} height={30} />
-            </div>
-            <div className="flex mt-4 border border-gray-500 rounded overflow-hidden">
-              <span className="bg-gray-800 flex items-center px-2">
-                <Image src="/images/t1.png" alt="Telegram" width={30} height={30} />
-              </span>
-              <Input type="email" placeholder="Your email" className="bg-transparent border-none" />
-            </div>
-          </div>
-        </div>
-        <hr className="my-6 border-gray-700" />
-        <p className="text-center text-sm">&copy; Premium Rental 2025 | Privacy Policy | Terms & Conditions</p>
-      </footer>
+      <Footer />
 
       {/* Modals */}
       <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white border-primary-opacity shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-center">WELCOME!</DialogTitle>
-            <p className="text-center text-gray-500">LOG IN TO CONTINUE</p>
+            <DialogTitle className="text-center text-2xl font-bold text-gray-900">
+              Welcome Back!
+            </DialogTitle>
+            <p className="text-center text-gray-600">
+              Sign in to access exclusive deals
+            </p>
           </DialogHeader>
-          <form className="space-y-3">
-            <Input placeholder="Email" />
-            <Input placeholder="Password" type="password" />
-            <div className="flex justify-between text-sm">
+          <form className="space-y-4">
+            <Input placeholder="Email address" className="input-primary" />
+            <Input
+              placeholder="Password"
+              type="password"
+              className="input-primary"
+            />
+            <div className="flex justify-between items-center text-sm">
               <label className="flex items-center space-x-2">
-                <input type="checkbox" /> <span>Remember Me</span>
+                <input type="checkbox" className="rounded border-gray-300" />
+                <span>Remember me</span>
               </label>
-              <a href="#" className="text-gray-500">Forgot Password?</a>
+              <a href="#" className="text-primary hover:text-primary/80">
+                Forgot password?
+              </a>
             </div>
-            <Button className="w-full">Login</Button>
-            <Button variant="outline" className="w-full flex items-center space-x-2">
+            <Button className="w-full gradient-primary gradient-primary-hover text-black font-semibold">
+              Sign In
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-center space-x-2 border-gray-300"
+            >
               <Image src="/images/go.png" alt="Google" width={20} height={20} />
               <span>Continue with Google</span>
             </Button>
           </form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={bookOpen} onOpenChange={setBookOpen}>
-        <DialogContent>
-          <Image src="/images/book-now.png" alt="Book Now" width={400} height={300} className="rounded" />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={topServiceOpen} onOpenChange={setTopServiceOpen}>
-        <DialogContent>
-          <Image src="/images/top-service.png" alt="Top Service" width={400} height={300} className="rounded" />
+          <p className="text-center text-sm text-gray-600">
+            Don&apos;t have an account?{" "}
+            <a
+              href="#"
+              className="text-primary hover:text-primary/80 font-semibold"
+            >
+              Sign up
+            </a>
+          </p>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

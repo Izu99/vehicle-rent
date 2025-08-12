@@ -1,10 +1,10 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  output: "export",
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',
   images: {
-    unoptimized: true,
+    unoptimized: true
   },
+  trailingSlash: true // optional if you want folder-style /h/index.html
 };
 
-export default nextConfig;
+module.exports = nextConfig;

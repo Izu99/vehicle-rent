@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 import { Star, MapPin, Calendar, Users, Shield, Award, Phone, Mail } from "lucide-react"
 
 export default function HomePage() {
@@ -15,8 +15,10 @@ export default function HomePage() {
   const [bookOpen, setBookOpen] = useState(false)
   const [topServiceOpen, setTopServiceOpen] = useState(false)
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
+  const containerVariants: Variants = {
+    hidden: { 
+      opacity: 0 
+    },
     visible: {
       opacity: 1,
       transition: {
@@ -25,12 +27,18 @@ export default function HomePage() {
     }
   }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+  const itemVariants: Variants = {
+    hidden: { 
+      opacity: 0, 
+      y: 30 
+    },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
+      transition: { 
+        duration: 0.6, 
+        ease: [0.6, -0.05, 0.01, 0.99] // Custom cubic bezier easing
+      }
     }
   }
 
@@ -40,7 +48,7 @@ export default function HomePage() {
       <motion.nav 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
         className="sticky top-0 bg-black/95 backdrop-blur-md border-b border-amber-500/20 z-50"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -86,7 +94,7 @@ export default function HomePage() {
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 1, ease: [0.6, -0.05, 0.01, 0.99] }}
             className="text-center max-w-4xl"
           >
             <motion.div
@@ -468,7 +476,7 @@ export default function HomePage() {
             </Button>
           </form>
           <p className="text-center text-sm text-gray-600">
-            Don't have an account? <a href="#" className="text-amber-600 hover:text-amber-700 font-semibold">Sign up</a>
+            Don&apos;t have an account? <a href="#" className="text-amber-600 hover:text-amber-700 font-semibold">Sign up</a>
           </p>
         </DialogContent>
       </Dialog>
