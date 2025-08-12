@@ -82,7 +82,7 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
         
-        <div className="relative h-full flex items-center justify-center text-white px-4 ">
+        <div className="relative h-full flex items-center justify-center text-white px-4">
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -93,7 +93,7 @@ export default function HomePage() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="bg-gradient-to-r from-amber-500/60 to-yellow-500/60 backdrop-blur-sm text-black px-8 py-6 rounded-2xl shadow-2xl mb-8 border border-amber-300/50"
+              className="bg-gradient-to-r from-amber-500/90 to-yellow-500/90 backdrop-blur-sm text-black px-8 py-6 rounded-2xl shadow-2xl mb-8 border border-amber-300/50"
             >
               <h1 className="text-4xl md:text-6xl font-bold mb-2">
                 Welcome to <span className="text-black">SKYLINE</span>
