@@ -135,13 +135,13 @@ export default function Navbar() {
                 className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 rounded-xl px-3 py-2 transition-colors"
               >
                 <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
-                  <span className="text-sm font-bold text-black">
+                  <span className="text-sm font-bold text-black bg-primary w-10 h-8 rounded-full flex items-center justify-center">
                     {user.username.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="hidden sm:block text-left">
                   <p className="text-white text-sm font-medium">{user.username}</p>
-                  <p className="text-primary text-xs">{roleInfo?.label}</p>
+                  <p className="text-gray-400 text-xs">{roleInfo?.label}</p>
                 </div>
               </button>
 
@@ -156,7 +156,7 @@ export default function Navbar() {
                   <div className="px-4 py-3 border-b border-gray-100">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
-                        <span className="text-sm font-bold text-black">
+                        <span className="text-sm font-bold text-black bg-primary w-10 h-10 rounded-full flex items-center justify-center">
                           {user.username.charAt(0).toUpperCase()}
                         </span>
                       </div>
@@ -290,7 +290,7 @@ export default function Navbar() {
                   {/* User Info */}
                   <div className="flex items-center space-x-3 p-3 bg-white/10 rounded-lg">
                     <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
-                      <span className="text-sm font-bold text-black">
+                      <span className="text-sm font-bold text-black bg-primary w-10 h-10 rounded-full flex items-center justify-center">
                         {user.username.charAt(0).toUpperCase()}
                       </span>
                     </div>

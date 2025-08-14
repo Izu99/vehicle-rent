@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
 import { 
   LayoutDashboard, 
   Car, 
@@ -15,15 +17,17 @@ import {
   Bell,
   LogOut,
   Menu,
-  X
+  X,
+  Crown,
+  Store
 } from "lucide-react"
 
 interface Tab {
   id: string;
   label: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: React.ComponentType<any>;
   badge?: string;
+  adminOnly?: boolean;
 }
 
 const sidebarTabs: Tab[] = [
@@ -46,6 +50,45 @@ interface ShopSidebarProps {
 
 export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const { user, logout } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await logout()
+    router.push('/')
+  }
+
+  // Get role info
+  const getRoleInfo = () => {
+    if (!user) return null
+    
+    switch (user.role) {
+      case 'admin':
+        return {
+          icon: Crown,
+          label: 'Administrator',
+          color: 'bg-purple-100 text-purple-800 border-purple-200'
+        }
+      case 'rent-shop':
+        return {
+          icon: Store,
+          label: 'Shop Owner',
+          color: 'bg-orange-100 text-orange-800 border-orange-200'
+        }
+      default:
+        return null
+    }
+  }
+
+  const roleInfo = getRoleInfo()
+
+  // Filter tabs based on user role (if needed)
+  const availableTabs = sidebarTabs.filter(tab => {
+    if (tab.adminOnly && user?.role !== 'admin') {
+      return false
+    }
+    return true
+  })
 
   const SidebarTab = ({ tab }: { tab: Tab }) => {
     const isActive = activeTab === tab.id
@@ -53,7 +96,7 @@ export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps
 
     const handleClick = () => {
       onTabChange(tab.id)
-      setIsMobileOpen(false) // Close mobile menu on tab change
+      setIsMobileOpen(false)
     }
 
     return (
@@ -93,8 +136,10 @@ export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps
             <Car className="w-6 h-6 text-black" />
           </div>
           <div>
-            <h2 className="font-bold text-gray-900">Premium Rentals</h2>
-            <p className="text-sm text-gray-500">Shop Dashboard</p>
+            <h2 className="font-bold text-gray-900">SKYLINE</h2>
+            <p className="text-sm text-gray-500">
+              {user?.role === 'admin' ? 'Admin Panel' : 'Shop Dashboard'}
+            </p>
           </div>
         </div>
       </div>
@@ -102,7 +147,7 @@ export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps
       {/* Navigation Tabs */}
       <div className="flex-1 p-4 overflow-y-auto">
         <nav className="space-y-2">
-          {sidebarTabs.map((tab) => (
+          {availableTabs.map((tab) => (
             <SidebarTab key={tab.id} tab={tab} />
           ))}
         </nav>
@@ -110,17 +155,36 @@ export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps
 
       {/* Bottom User Section */}
       <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer mb-2">
-          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-sm font-bold text-black">JD</span>
+        {/* User Info Card */}
+        <div className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer mb-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
+            <span className="text-sm font-bold text-black">
+              {user?.username?.charAt(0).toUpperCase() || 'U'}
+            </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">John Doe</p>
-            <p className="text-xs text-gray-500 truncate">john@premiumrentals.com</p>
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {user?.username || 'User'}
+            </p>
+            <p className="text-xs text-gray-500 truncate">
+              {user?.email || 'No email'}
+            </p>
           </div>
         </div>
+
+        {/* Role Badge */}
+        {roleInfo && (
+          <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border mb-3 ${roleInfo.color}`}>
+            <roleInfo.icon className="w-4 h-4" />
+            <span className="text-sm font-medium">{roleInfo.label}</span>
+          </div>
+        )}
         
-        <button className="w-full flex items-center space-x-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+        {/* Logout Button */}
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center space-x-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+        >
           <LogOut className="w-4 h-4" />
           <span className="text-sm font-medium">Sign Out</span>
         </button>
@@ -167,5 +231,4 @@ export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps
   )
 }
 
-// Export the tabs array and find function for use in parent components
 export { sidebarTabs }

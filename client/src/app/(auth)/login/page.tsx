@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,6 +33,8 @@ export default function LoginPage() {
 
   const { login } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,20 +44,22 @@ export default function LoginPage() {
     try {
       await login(formData.username, formData.password)
       
-      // Get user role from storage to redirect appropriately
-      const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
-      const role = storedUser.role
+      // Get user role to redirect appropriately
+      const userData = JSON.parse(localStorage.getItem('user') || '{}')
+      const role = userData.role
 
-      // Redirect based on role
-      if (role === 'admin') {
+      // Redirect based on role or redirect parameter
+      if (redirectTo && redirectTo !== '/') {
+        router.push(redirectTo)
+      } else if (role === 'admin') {
         router.push('/admin')
       } else if (role === 'rent-shop') {
         router.push('/shop')
       } else {
-        router.push('/customer')
+        router.push('/')
       }
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || 'Login failed')
     } finally {
       setLoading(false)
     }
@@ -97,7 +101,7 @@ export default function LoginPage() {
               Welcome to <span className="text-primary">Skyline</span>
             </h1>
             <p className="text-gray-600 text-lg leading-relaxed max-w-md">
-              Sri Lanka's premier car rental marketplace connecting you with trusted rental partners
+              Sri Lanka&apos;s premier car rental marketplace connecting you with trusted rental partners
             </p>
           </div>
 
@@ -221,7 +225,7 @@ export default function LoginPage() {
 
               <div className="text-center pt-6 border-t border-gray-200">
                 <p className="text-gray-600">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link 
                     href="/register" 
                     className="text-primary hover:text-primary/80 font-semibold transition-colors"
