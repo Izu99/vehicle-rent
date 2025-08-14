@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Bootstrap JS Bundle (with Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+   body {
+      background: #f8f9fa;
+    }
+    .sidebar {
+      height: 100vh;
+      position: fixed;
+      background-color: white;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      width: 250px;
+      padding-top: 20px;
+    }
+    .sidebar a {
+      text-decoration: none;
+      padding: 15px;
+      display: block;
+      color: #333;
+    }
+    .sidebar a:hover, .sidebar .active {
+      background-color: #e7f1ff;
+      color: #0d6efd;
+      border-left: 4px solid #0d6efd;
+    }
+    .content {
+      margin-left: 270px;
+      padding: 20px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+     .user-info {
+      display: flex;
+      align-items: center;
+    }
+    .user-info img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      margin-left: 10px;
+    }
+     .admin-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-profile img {
+      width: 30px;
+      height: 20px;
+      border-radius: 50%;
+    }
+    
+/* Summary Card Custom Styling */
+.card {
+  border-radius: 12px;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.card-body h6 {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.card-body h4 {
+  font-weight: 600;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.badge {
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+
+/* Specific color tweaks for clarity */
+.bg-info-subtle {
+  background-color: #e0f0ff;
+  color: #0d6efd;
+}
+
+.bg-danger-subtle {
+  background-color: #f8d7da;
+  color: #dc3545;
+}
+
+.bg-info-subtle {
+  background-color: #e0f0ff;
+  color: #0d6efd;
+}
+ .btn-yellow {
+      background-color: #FFD700;
+      color: black;
+    }
+    .table thead th {
+  font-weight: 600;
+  font-size: 0.95rem;
+   background-color: #e0f0ff;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}
+
+/* Common badge style */
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* Completed - Green background, dark green text */
+.badge-completed {
+  background-color: #8B8B8B;
+  color: #000000;
+}
+
+/* Awaiting - Light blue background, blue text */
+.badge-awaiting {
+  background-color: #EFF8FF;
+  color: #175CD3;
+}
+
+/* Overdue - Light red background, dark red text */
+.badge-overdue {
+  background-color: #FEE4E2;
+  color: #B42318;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+    </style>
+</head>
+<body>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="text-center mb-4">
+       <img src="sky remove.png" alt="Logo" style="height: 130px; margin-right: 10px;"><strong>  SKYLINE </strong>
+       
+        
+      </div>
+      <a href="dashboard.html"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+      <a href="rent-dashboard.html"><i class="fas fa-users me-2"></i> Rent</a>
+      <a href="bookings-dashboard.html"><i class="fas fa-calendar-check me-2"></i> Bookings</a>
+      <a href="schedule-dashboard.html"><i class="fas fa-calendar-alt me-2"></i> Schedule</a>
+      <a href="#" class="active"><i class="fas fa-dollar-sign me-2"></i> Payments</a>
+      <a href="#"><i class="fas fa-envelope me-2"></i> Messages</a>
+      <a href="#"><i class="fas fa-bookmark me-2"></i> Saved</a>
+      <a href="#"><i class="fas fa-exchange-alt me-2"></i> Transactions</a>
+      <!-- Car Reports Main Item with Collapse -->
+<a class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#carReportsSubmenu" role="button" aria-expanded="false" aria-controls="carReportsSubmenu">
+    <a href="car reports-dashboard.html"><i class="fas fa-car me-2"></i> Car Reports</span>
+    <i class="fas fa-chevron-down small"></i>
+  </a>
+  <div class="collapse ps-4" id="carReportsSubmenu">
+    <a href="#" class="nav-link" onclick="showSection('carDetailsSection')">Car Details</a>
+  </div>
+  ...
+</div>
+    <!-- Main Content -->
+    <div class="content w-100">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+          <h2 class="mb-0">Payments</h2>
+          <input type="text" class="form-control" placeholder="Search anything..." style="width: 200px;">
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="topbar-icons">
+            
+             <!-- Notification Icon Button -->
+<button class="btn btn-light position-relative me-3" data-bs-toggle="modal" data-bs-target="#notificationModal">
+  <i class="fas fa-bell"></i>
+  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+    3
+    <span class="visually-hidden">unread notifications</span>
+  </span>
+</button>
+
+            <!-- Help Icon Button -->
+<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#helpModal">
+  <i class="fas fa-question-circle"></i>
+</button>
+            <!-- Settings Icon Button -->
+<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#settingsModal">
+  <i class="fas fa-cog"></i>
+</button>
+           <!-- Logout Icon Button -->
+<button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#logoutModal">
+  <i class="fas fa-sign-out"></i>
+</button>
+          </div>
+          <div class="admin-profile">
+            <img src="profile.jpg" alt="Admin">
+            <div>
+              <strong>John Septimus</strong><br>
+              <small class="text-muted">Admin</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+  <!-- Completed Payment Card -->
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div class="me-2">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+          </div>
+          <h6 class="mb-0 fw-bold">Completed Payment</h6>
+        </div>
+        <h4 class="fw-semibold">$22,450</h4>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="badge bg-light text-dark">350 invoices</span>
+          <span class="badge bg-info-subtle text-info">+2.75% <small class="text-muted">from last week</small></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Awaiting Payment Card -->
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div class="me-2">
+            <i class="bi bi-clock-history text-primary fs-5"></i>
+          </div>
+          <h6 class="mb-0 fw-bold">Awaiting Payment</h6>
+        </div>
+        <h4 class="fw-semibold">$15,300</h4>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="badge bg-light text-dark">250 invoices</span>
+          <span class="badge bg-danger-subtle text-danger">-1.05% <small class="text-muted">from last week</small></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overdue Payment Card -->
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div class="me-2">
+            <i class="bi bi-exclamation-circle text-danger fs-5"></i>
+          </div>
+          <h6 class="mb-0 fw-bold">Overdue</h6>
+        </div>
+        <h4 class="fw-semibold">$12,730</h4>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="badge bg-light text-dark">180 invoices</span>
+          <span class="badge bg-info-subtle text-info">+3.45% <small class="text-muted">from last week</small></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Search and Filter Bar -->
+<div class="d-flex flex-wrap gap-3 align-items-center mb-4">
+  <!-- Search Input with Icon -->
+  <div class="input-group" style="max-width: 250px;">
+    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+    <input type="text" class="form-control border-start-0" placeholder="Search invoice, client name etc">
+  </div>
+           <input type="date" class="form-control w-25">
+  <!-- Status Filter with Icon -->
+  <div class="input-group" style="max-width: 200px;">
+    <span class="input-group-text bg-white border-end-0"><i class="bi bi-funnel"></i></span>
+    <select class="form-select border-start-0">
+      <option selected>Status</option>
+      <option value="completed">Completed</option>
+      <option value="awaiting">Awaiting</option>
+      <option value="overdue">Overdue</option>
+    </select>
+  </div>
+  <button class="btn btn-yellow ms-3" data-bs-toggle="modal" data-bs-target="#createInvoiceModal"><strong>Create Invoice</strong></button>
+  </div> 
+  <div class="table-responsive">
+  <table class="table table-bordered align-middle text-nowrap">
+    <thead class="table-info">
+      <tr>
+        <th>Invoice Id</th>
+        <th>Client Name</th>
+        <th>Car Model</th>
+        <th>Rate per day</th>
+        <th>Rental Period</th>
+        <th>Amount</th>
+        <th>Due Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>INV-SL1001</td>
+        <td>Alice Johnson</td>
+        <td>Mercedes Benz</td>
+        <td>$50</td>
+        <td>3 Days</td>
+        <td>$150</td>
+        <td>2025-04-05</td>
+        <td><span class="status-badge badge-completed">Completed</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editInvoiceModal">Edit</button>
+          <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteInvoiceModal">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td>INV-SL1002</td>
+        <td>Bob Smith</td>
+        <td>Chevrolet Camaro</td>
+        <td>$45</td>
+        <td>5 Days</td>
+        <td>$225</td>
+        <td>2025-04-06</td>
+        <td><span class="status-badge badge-awaiting">Awaiting</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td>INV-SL1003</td>
+        <td>Charlie Davis</td>
+        <td>Audi 03 SUV</td>
+        <td>$55</td>
+        <td>2 Days</td>
+        <td>$110</td>
+        <td>2025-04-07</td>
+        <td><span class="status-badge badge-overdue">Overdue</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td>INV-SL1003</td>
+        <td>Charlie Davis</td>
+        <td>Audi 03 SUV</td>
+        <td>$55</td>
+        <td>2 Days</td>
+        <td>$110</td>
+        <td>2025-04-07</td>
+        <td><span class="status-badge badge-overdue">Overdue</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td>INV-SL1002</td>
+        <td>Bob Smith</td>
+        <td>Chevrolet Camaro</td>
+        <td>$45</td>
+        <td>5 Days</td>
+        <td>$225</td>
+        <td>2025-04-06</td>
+        <td><span class="status-badge badge-awaiting">Awaiting</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td>INV-SL1001</td>
+        <td>Alice Johnson</td>
+        <td>Mercedes Benz</td>
+        <td>$50</td>
+        <td>3 Days</td>
+        <td>$150</td>
+        <td>2025-04-05</td>
+       <td><span class="status-badge badge-completed">Completed</span></td>
+                <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+
+      </tr>
+       <tr>
+        <td>INV-SL1001</td>
+        <td>Alice Johnson</td>
+        <td>Mercedes Benz</td>
+        <td>$50</td>
+        <td>3 Days</td>
+        <td>$150</td>
+        <td>2025-04-05</td>
+        <td><span class="status-badge badge-completed">Completed</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td>INV-SL1002</td>
+        <td>Bob Smith</td>
+        <td>Chevrolet Camaro</td>
+        <td>$45</td>
+        <td>5 Days</td>
+        <td>$225</td>
+        <td>2025-04-06</td>
+        <td><span class="status-badge badge-awaiting">Awaiting</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+      <tr>
+        <td>INV-SL1003</td>
+        <td>Charlie Davis</td>
+        <td>Audi 03 SUV</td>
+        <td>$55</td>
+        <td>2 Days</td>
+        <td>$110</td>
+        <td>2025-04-07</td>
+        <td><span class="status-badge badge-overdue">Overdue</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+       <tr>
+        <td>INV-SL1001</td>
+        <td>Alice Johnson</td>
+        <td>Mercedes Benz</td>
+        <td>$50</td>
+        <td>3 Days</td>
+        <td>$150</td>
+        <td>2025-04-05</td>
+        <td><span class="status-badge badge-completed">Completed</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark">Edit</button>
+          <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> 
+<!-- Notification Modal (Payments Dashboard Style) -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-end modal-sm modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="notificationModalLabel">
+          <i class="bi bi-bell-fill me-2"></i>Notifications
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-2">
+        <ul class="list-group list-group-flush">
+
+          <!-- Notification: Overdue -->
+          <li class="list-group-item d-flex align-items-start">
+            <i class="bi bi-exclamation-circle text-danger fs-5 me-3"></i>
+            <div>
+              <strong class="text-danger">Overdue Payment</strong><br>
+              Invoice <strong>INV-1023</strong> is overdue.
+              <small class="d-block text-muted">5 mins ago</small>
+            </div>
+          </li>
+
+          <!-- Notification: Payment Completed -->
+          <li class="list-group-item d-flex align-items-start">
+            <i class="bi bi-check-circle text-success fs-5 me-3"></i>
+            <div>
+              <strong class="text-success">Payment Completed</strong><br>
+              Invoice <strong>INV-1020</strong> was paid successfully.
+              <small class="d-block text-muted">20 mins ago</small>
+            </div>
+          </li>
+
+          <!-- Notification: Awaiting -->
+          <li class="list-group-item d-flex align-items-start">
+            <i class="bi bi-clock-history text-primary fs-5 me-3"></i>
+            <div>
+              <strong class="text-primary">Awaiting Payment</strong><br>
+              Invoice <strong>INV-1019</strong> is still pending.
+              <small class="d-block text-muted">1 hour ago</small>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel"><i class="fas fa-sign-out-alt me-2 text-danger"></i>Confirm Logout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-3">Are you sure you want to logout?</p>
+        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+        <a href="logout.html" class="btn btn-danger">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="settingsModalLabel"><i class="fas fa-cog me-2 text-primary"></i>Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email Notifications</label>
+              <select class="form-select" id="email">
+                <option selected>Enabled</option>
+                <option>Disabled</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="theme" class="form-label">Theme</label>
+              <select class="form-select" id="theme">
+                <option selected>Light</option>
+                <option>Dark</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="language" class="form-label">Language</label>
+              <select class="form-select" id="language">
+                <option selected>English</option>
+                <option>Spanish</option>
+                <option>French</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="timezone" class="form-label">Time Zone</label>
+              <input type="text" class="form-control" id="timezone" placeholder="e.g., GMT+5:30">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Save Settings</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="helpModalLabel">
+          <i class="fas fa-question-circle text-info me-2"></i>Help & Support
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 class="mb-3">How can we help you?</h6>
+        <ul class="list-group mb-3">
+          <li class="list-group-item">
+            <strong>🚗 Managing Drivers:</strong> Go to the "Drivers" section to add, update, or remove drivers.
+          </li>
+          <li class="list-group-item">
+            <strong>📅 Scheduling:</strong> Use the "Schedule" tab to manage driver availability.
+          </li>
+          <li class="list-group-item">
+            <strong>💳 Payments:</strong> View or manage driver payments in the "Payments" section.
+          </li>
+        </ul>
+        <p class="text-muted">Still need help? Contact support at <a href="mailto:support@skylinerentals.com">support@skylinerentals.com</a>.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info text-white" data-bs-dismiss="modal">Got it</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Create Invoice Modal -->
+<div class="modal fade" id="createInvoiceModal" tabindex="-1" aria-labelledby="createInvoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createInvoiceModalLabel">
+          <i class="bi bi-file-earmark-plus text-primary me-2"></i>Create New Invoice
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Client Name</label>
+              <input type="text" class="form-control" placeholder="e.g., John Doe" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Invoice Number</label>
+              <input type="text" class="form-control" placeholder="e.g., INV-1025" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Amount</label>
+              <input type="number" class="form-control" placeholder="e.g., 1500" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Status</label>
+              <select class="form-select" required>
+                <option selected disabled>Choose Status</option>
+                <option>Completed</option>
+                <option>Awaiting</option>
+                <option>Overdue</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Due Date</label>
+              <input type="date" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" rows="3" placeholder="Add any additional information..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Edit Invoice Modal -->
+<div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editInvoiceModalLabel">
+          <i class="bi bi-pencil-square text-warning me-2"></i>Edit Invoice
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Client Name</label>
+              <input type="text" class="form-control" value="John Doe" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Invoice Number</label>
+              <input type="text" class="form-control" value="INV-1025" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" value="2025-04-30" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Amount</label>
+              <input type="number" class="form-control" value="1500" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Status</label>
+              <select class="form-select" required>
+                <option selected>Completed</option>
+                <option>Awaiting</option>
+                <option>Overdue</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Due Date</label>
+              <input type="date" class="form-control" value="2025-05-10" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" rows="3">Payment received by bank transfer.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteInvoiceModal" tabindex="-1" aria-labelledby="deleteInvoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-danger">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteInvoiceModalLabel">
+          <i class="bi bi-trash me-2"></i>Delete Invoice
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Are you sure you want to delete <strong>INV-1001</strong>?</p>
+        <div class="d-flex justify-content-center gap-2">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
