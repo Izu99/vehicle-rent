@@ -1,0 +1,157 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Default Theme Variables */
+:root {
+  /* Primary Colors (Amber by default) */
+  --color-primary: 251 191 36;        /* amber-400 */
+  --color-primary-hover: 245 158 11;  /* amber-500 */
+  --color-primary-light: 255 251 235; /* amber-50 */
+  --color-primary-dark: 180 83 9;     /* amber-700 */
+  
+  /* Secondary Colors */
+  --color-secondary: 253 224 71;      /* yellow-300 */
+  --color-secondary-hover: 250 204 21; /* yellow-400 */
+  
+  /* Text Colors */
+  --color-text-primary: 180 83 9;     /* amber-700 */
+  --color-text-accent: 245 158 11;    /* amber-500 */
+  
+  /* Border Colors */
+  --color-border-primary: 251 191 36; /* amber-400 */
+  --color-border-focus: 251 191 36;   /* amber-400 */
+}
+
+/* Blue Theme */
+[data-theme="blue"] {
+  --color-primary: 59 130 246;        /* blue-500 */
+  --color-primary-hover: 37 99 235;   /* blue-600 */
+  --color-primary-light: 239 246 255; /* blue-50 */
+  --color-primary-dark: 29 78 216;    /* blue-700 */
+  
+  --color-secondary: 147 197 253;     /* blue-300 */
+  --color-secondary-hover: 96 165 250; /* blue-400 */
+  
+  --color-text-primary: 29 78 216;    /* blue-700 */
+  --color-text-accent: 59 130 246;    /* blue-500 */
+  
+  --color-border-primary: 59 130 246; /* blue-500 */
+  --color-border-focus: 59 130 246;   /* blue-500 */
+}
+
+/* Component Classes Using CSS Variables */
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply bg-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary-hover))] text-white font-semibold px-6 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-[rgb(var(--color-secondary))] hover:bg-[rgb(var(--color-secondary-hover))] text-black font-semibold px-6 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200;
+  }
+  
+  /* Form Elements */
+  .input-primary {
+    @apply w-full bg-white border-2 border-[rgb(var(--color-border-primary))]/50 text-black rounded-xl px-4 py-3 font-medium shadow-sm focus:ring-2 focus:ring-[rgb(var(--color-border-focus))] focus:border-[rgb(var(--color-border-focus))] transition-all;
+  }
+  
+  .select-primary {
+    @apply w-full bg-white border-2 border-[rgb(var(--color-border-primary))]/50 text-black rounded-xl px-4 py-3 font-medium shadow-sm focus:ring-2 focus:ring-[rgb(var(--color-border-focus))] focus:border-[rgb(var(--color-border-focus))] transition-all;
+  }
+  
+  /* Text Colors */
+  .text-primary {
+    @apply text-[rgb(var(--color-text-primary))];
+  }
+  
+  .text-accent {
+    @apply text-[rgb(var(--color-text-accent))];
+  }
+  
+  /* Backgrounds */
+  .bg-primary {
+    @apply bg-[rgb(var(--color-primary))];
+  }
+  
+  .bg-primary-light {
+    @apply bg-[rgb(var(--color-primary-light))];
+  }
+  
+  .bg-accent {
+    @apply bg-[rgb(var(--color-text-accent))];
+  }
+  
+  /* Gradients */
+  .gradient-primary {
+    @apply bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-secondary))];
+  }
+  
+  .gradient-primary-hover {
+    @apply hover:from-[rgb(var(--color-primary-hover))] hover:to-[rgb(var(--color-secondary-hover))];
+  }
+  
+  .gradient-hero {
+    @apply bg-gradient-to-r from-black/80 via-black/50 to-transparent;
+  }
+  
+  .gradient-background {
+    @apply bg-gradient-to-b from-gray-50 to-white;
+  }
+  
+  .gradient-dark {
+    @apply bg-gradient-to-r from-gray-900 via-black to-gray-900;
+  }
+  
+  /* Badges */
+  .badge-primary {
+    @apply bg-[rgb(var(--color-primary-light))] text-[rgb(var(--color-text-primary))] px-4 py-2 text-sm font-medium rounded-full;
+  }
+  
+  .badge-accent {
+    @apply bg-[rgb(var(--color-text-accent))] text-white px-4 py-2 text-sm font-semibold rounded-full;
+  }
+  
+  /* Borders */
+  .border-primary {
+    @apply border-[rgb(var(--color-border-primary))];
+  }
+  
+  .border-primary-opacity {
+    @apply border-[rgb(var(--color-border-primary))]/20;
+  }
+}
+
+/* Enhanced sidebar tab styling */
+.sidebar-tab-active {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateX(4px);
+}
+
+.sidebar-tab-inactive:hover {
+  background: rgba(0, 0, 0, 0.02);
+  transform: translateX(2px);
+}
+
+/* Smooth content transitions */
+.content-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Active tab indicator glow */
+.active-tab-glow {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Responsive sidebar */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+

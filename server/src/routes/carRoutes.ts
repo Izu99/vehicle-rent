@@ -5,22 +5,24 @@ import {
   getAllCars,
   getCarById,
   updateCar,
-  deleteCar
+  deleteCar,
+  toggleCarAvailability // Add this if you want the toggle functionality
 } from '../controllers/carController';
 import { authMiddleware } from '../middleware/auth';
 import { requireRole } from '../middleware/roles';
-import { uploadCarImages } from '../middleware/uploads'; // Import upload middleware
+import { uploadCarImages } from '../middleware/uploads';
 
 const router = express.Router();
 
-// Add car WITH images in one step
+// Add car WITH multiple images using single field name
 router.post('/', authMiddleware, requireRole('rent-shop'), uploadCarImages, addCar);
 
-// Other routes remain the same
+// Other routes
 router.get('/', getAllCars);
 router.get('/:carId', getCarById);
 router.get('/shop/:shopId', authMiddleware, getShopCars);
 router.put('/:carId', authMiddleware, updateCar);
 router.delete('/:carId', authMiddleware, deleteCar);
+router.patch('/:carId/toggle-availability', authMiddleware, toggleCarAvailability);
 
 export default router;
