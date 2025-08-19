@@ -56,12 +56,12 @@ export default function Navbar() {
           color: 'bg-purple-100 text-purple-800',
           dashboardRoute: '/admin'
         }
-      case 'rent-shop':
+      case 'rental-company':
         return {
           icon: Store,
-          label: 'Shop Owner',
+          label: 'Company Owner',
           color: 'bg-orange-100 text-orange-800',
-          dashboardRoute: '/shop'
+          dashboardRoute: '/company'
         }
       case 'customer':
         return {
@@ -172,8 +172,8 @@ export default function Navbar() {
 
                   {/* Menu Items */}
                   <div className="py-2">
-                    {/* Only show dashboard link for shop/admin users */}
-                    {(user.role === 'rent-shop' || user.role === 'admin') && (
+                    {/* Only show dashboard link for company/admin users */}
+                    {(user.role === 'rental-company' || user.role === 'admin') && (
                       <Link
                         href={roleInfo?.dashboardRoute || '/'}
                         onClick={closeMobileMenu}
@@ -302,8 +302,8 @@ export default function Navbar() {
                     </div>
                   </div>
 
-                  {/* Dashboard Button (only for shop/admin) */}
-                  {(user.role === 'rent-shop' || user.role === 'admin') && (
+                  {/* Dashboard Button (only for company/admin) */}
+                  {(user.role === 'rental-company' || user.role === 'admin') && (
                     <Button
                       onClick={() => {
                         router.push(roleInfo?.dashboardRoute || '/')

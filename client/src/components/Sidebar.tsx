@@ -43,12 +43,12 @@ const sidebarTabs: Tab[] = [
   { id: 'settings', label: 'Settings', icon: Settings }
 ]
 
-interface ShopSidebarProps {
+interface CompanySidebarProps {
   activeTab: string;
   onTabChange: (tabId: string) => void;
 }
 
-export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps) {
+export default function CompanySidebar({ activeTab, onTabChange }: CompanySidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const { user, logout } = useAuth()
   const router = useRouter()
@@ -69,10 +69,10 @@ export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps
           label: 'Administrator',
           color: 'bg-purple-100 text-purple-800 border-purple-200'
         }
-      case 'rent-shop':
+      case 'rental-company':
         return {
           icon: Store,
-          label: 'Shop Owner',
+          label: 'Company Owner',
           color: 'bg-orange-100 text-orange-800 border-orange-200'
         }
       default:
@@ -129,7 +129,7 @@ export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps
 
   const sidebarContent = (
     <>
-      {/* Shop Header */}
+      {/* Company Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-xl flex items-center justify-center">
@@ -138,7 +138,7 @@ export default function ShopSidebar({ activeTab, onTabChange }: ShopSidebarProps
           <div>
             <h2 className="font-bold text-gray-900">SKYLINE</h2>
             <p className="text-sm text-gray-500">
-              {user?.role === 'admin' ? 'Admin Panel' : 'Shop Dashboard'}
+              {user?.role === 'admin' ? 'Admin Panel' : 'Company Dashboard'}
             </p>
           </div>
         </div>

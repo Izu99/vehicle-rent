@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react" 
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import ShopSidebar from "@/components/Sidebar"
-import DashboardTab from "@/components/shops/DashboardTab"
-import CarsTab from "@/components/shops/CarsTab"
-import WebTab from "@/components/shops/WebTab"
+import CompanySidebar from "@/components/Sidebar"
+import DashboardTab from "@/components/Companies/DashboardTab"
+import CarsTab from "@/components/Companies/CarsTab"
+import WebTab from "@/components/Companies/WebTab"
 import { useAuth } from "@/contexts/AuthContext"
 
 const tabComponents = {
@@ -41,8 +41,8 @@ const UnauthorizedAccess = () => {
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-        <p className="text-gray-600 mb-4">You don't have permission to access this shop dashboard.</p>
-        <p className="text-sm text-gray-500 mb-6">Only shop owners and administrators can access this area.</p>
+        <p className="text-gray-600 mb-4">You don't have permission to access this company dashboard.</p>
+        <p className="text-sm text-gray-500 mb-6">Only company owners and administrators can access this area.</p>
         <div className="flex gap-3 justify-center">
           <button 
             onClick={() => router.push('/')} 
@@ -62,7 +62,7 @@ const UnauthorizedAccess = () => {
   )
 }
 
-export default function ShopPage() {
+export default function CompanyPage() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const { user, isLoading } = useAuth()
   const router = useRouter()
@@ -72,7 +72,7 @@ export default function ShopPage() {
   // Redirect unauthenticated users
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/login?redirect=/shop')
+      router.push('/login?redirect=/company')
     }
   }, [user, isLoading, router])
 
@@ -87,18 +87,18 @@ export default function ShopPage() {
   }
 
   // Check if user has proper role (this is backup to middleware)
-  if (user.role !== 'rent-shop' && user.role !== 'admin') {
+  if (user.role !== 'rental-company' && user.role !== 'admin') {
     return <UnauthorizedAccess />
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <ShopSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <CompanySidebar activeTab={activeTab} onTabChange={setActiveTab} />
       
       <div className="flex-1 lg:ml-72">
-        <div className="bg-white shadow-sm border-b border-gray-200 px-8 py-4 sticky top-0 z-30">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900 capitalize bg-blue-100/20 rounded-2xl p-2 w-full text-center ">{activeTab}</h1>
+        {/* <div className="bg-white shadow-sm border-b border-gray-200 px-8 py-4 sticky top-0 z-30"> */}
+          {/* <div className="flex items-center justify-between"> */}
+            {/* <h1 className="text-2xl font-bold text-gray-900 capitalize bg-blue-100/20 rounded-2xl p-2 w-full text-center ">{activeTab}</h1> */}
             {/* <div className="flex items-center space-x-3">
               <div className="text-sm text-gray-500">
                 Welcome back, <span className="font-medium text-gray-900">{user.username}</span>
@@ -108,9 +108,9 @@ export default function ShopPage() {
                   {user.username.charAt(0).toUpperCase()}
                 </span>
               </div>
-            </div> */}
-          </div>
-        </div>
+            // </div> */}
+          {/* </div> */}
+        {/* </div> */}
 
         <div className="p-8">
           <motion.div

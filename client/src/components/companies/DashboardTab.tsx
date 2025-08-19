@@ -8,7 +8,7 @@ interface DashboardTabProps {
 }
 
 export default function DashboardTab() {
-  // Simple mock data - replace with your useShopData hook
+  // Simple mock data - replace with your useCompanyData hook
   const stats = {
     totalRevenue: 45231,
     activeCars: 24,

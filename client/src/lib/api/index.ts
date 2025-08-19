@@ -32,10 +32,12 @@ class ApiClient {
 
     // Remove Content-Type for FormData requests
     if (options.body instanceof FormData) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (config.headers as any)['Content-Type'];
     }
 
     try {
+      
       const response = await fetch(url, config);
       
       if (!response.ok) {

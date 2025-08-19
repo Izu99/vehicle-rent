@@ -53,8 +53,8 @@ export default function LoginPage() {
         router.push(redirectTo)
       } else if (role === 'admin') {
         router.push('/admin')
-      } else if (role === 'rent-shop') {
-        router.push('/shop')
+      } else if (role === 'rental-company') {
+        router.push('/company')
       } else {
         router.push('/')
       }
@@ -243,7 +243,7 @@ export default function LoginPage() {
                     👤 Customer
                   </Badge>
                   <Badge className="bg-green-100 text-green-800 px-3 py-1">
-                    🏪 Rent Shop
+                    🏪 Rent Company
                   </Badge>
                   <Badge className="bg-purple-100 text-purple-800 px-3 py-1">
                     👑 Admin

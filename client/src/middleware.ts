@@ -16,9 +16,9 @@ export function middleware(request: NextRequest) {
     }
   }
   
-  // Check if accessing shop routes
-  if (request.nextUrl.pathname.startsWith('/shop')) {
-    if (!user || !authToken || (user.role !== 'rent-shop' && user.role !== 'admin')) {
+  // Check if accessing company routes
+  if (request.nextUrl.pathname.startsWith('/company')) {
+    if (!user || !authToken || (user.role !== 'rental-company' && user.role !== 'admin')) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
       return NextResponse.redirect(loginUrl)
@@ -39,7 +39,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/shop/:path*',
+    '/company/:path*',
     '/admin/:path*'
   ]
 }

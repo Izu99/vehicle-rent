@@ -1,10 +1,9 @@
 import express from 'express';
 import { 
-  register, 
-  login, 
-  getCurrentUser, 
-  // getUserProfile, 
-  updateUserProfile,
+  register,
+  login,
+  getCurrentUser,
+  updateUserProfile, 
   getAllUsers
 } from '../controllers/authController';
 import { authMiddleware } from '../middleware/auth';

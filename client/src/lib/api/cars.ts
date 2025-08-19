@@ -1,15 +1,19 @@
-import { apiClient } from './index';
+// lib/api/cars.ts
 
-// Types
+import { apiClient } from './index'; // Make sure ./index exports apiClient (axios or fetch wrapper)
+
+// --- Types ---
+export interface RentalCompany {
+  _id: string;
+  name: string;
+  locations: string[];
+  phone?: string;
+  email?: string;
+}
+
 export interface Car {
   _id: string;
-  shopId: {
-    _id: string;
-    shopName: string;
-    shopAddress: string;
-    phone: string;
-    email: string;
-  } | string; // Can be populated or just ID
+  companyId: RentalCompany; // Populated!
   brand: string;
   carModel: string;
   year: number;
@@ -34,6 +38,7 @@ export interface Car {
   updatedAt: string;
 }
 
+// --- API Responses ---
 export interface CarsResponse {
   success: boolean;
   cars: Car[];
@@ -55,19 +60,21 @@ export interface CarResponse {
   message: string;
 }
 
-export interface ShopCarsResponse {
+export interface CompanyCarsResponse {
   success: boolean;
   cars: Car[];
   total: number;
-  shopInfo: {
-    shopName: string;
-    shopAddress: string;
+  companyInfo: {
+    name: string;
+    locations: string[];
+    phone?: string;
+    email?: string;
   };
   message: string;
 }
 
+// --- API Methods ---
 export const carsApi = {
-  // Get all cars with filters (public endpoint)
   getAll: async (filters?: {
     brand?: string;
     fuelType?: string;
@@ -81,7 +88,6 @@ export const carsApi = {
     sortOrder?: 'asc' | 'desc';
   }): Promise<CarsResponse> => {
     const queryParams = new URLSearchParams();
-    
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== '' && value !== null) {
@@ -89,53 +95,36 @@ export const carsApi = {
         }
       });
     }
-    
     const endpoint = `/cars${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return apiClient.get<CarsResponse>(endpoint);
   },
 
-  // Get single car by ID (public endpoint)
   getById: async (carId: string): Promise<CarResponse> => {
-    if (!carId) {
-      throw new Error('Car ID is required');
-    }
+    if (!carId) throw new Error('Car ID is required');
     return apiClient.get<CarResponse>(`/cars/${carId}`);
   },
 
-  // Get cars for a specific shop (protected endpoint)
-  getShopCars: async (shopId: string): Promise<ShopCarsResponse> => {
-    if (!shopId) {
-      throw new Error('Shop ID is required');
-    }
-    return apiClient.get<ShopCarsResponse>(`/cars/shop/${shopId}`);
+  getCompanyCars: async (companyId: string): Promise<CompanyCarsResponse> => {
+    if (!companyId) throw new Error('Company ID is required');
+    return apiClient.get<CompanyCarsResponse>(`/cars/company/${companyId}`);
   },
 
-  // Add new car (protected endpoint - rent-shop only)
   addCar: async (carData: FormData): Promise<CarResponse> => {
-    return apiClient.post<CarResponse>('/cars', carData);
+    return apiClient.post<CarResponse>(`/cars`, carData);
   },
 
-  // Update car (protected endpoint)
   updateCar: async (carId: string, carData: Partial<Car>): Promise<CarResponse> => {
-    if (!carId) {
-      throw new Error('Car ID is required');
-    }
+    if (!carId) throw new Error('Car ID is required');
     return apiClient.put<CarResponse>(`/cars/${carId}`, carData);
   },
 
-  // Delete car (protected endpoint)
   deleteCar: async (carId: string): Promise<{ success: boolean; message: string }> => {
-    if (!carId) {
-      throw new Error('Car ID is required');
-    }
+    if (!carId) throw new Error('Car ID is required');
     return apiClient.delete(`/cars/${carId}`);
   },
 
-  // Toggle car availability (protected endpoint)
   toggleAvailability: async (carId: string): Promise<CarResponse> => {
-    if (!carId) {
-      throw new Error('Car ID is required');
-    }
+    if (!carId) throw new Error('Car ID is required');
     return apiClient.put<CarResponse>(`/cars/${carId}/toggle-availability`, {});
-  }
+  },
 };

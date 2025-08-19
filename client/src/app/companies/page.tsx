@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
 import {
   Star,
@@ -13,10 +13,8 @@ import {
   Search,
   Filter,
   Car,
-  Users,
   Phone,
   Mail,
-  Globe,
   Shield,
   Award,
   Clock,
@@ -27,6 +25,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { companiesApi, RentalCompany } from "@/lib/api/companies";
 
 export default function CompaniesPage() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -36,6 +35,11 @@ export default function CompaniesPage() {
     rating: "",
     search: "",
   });
+
+  // Real data states
+  const [companies, setCompanies] = useState<RentalCompany[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -54,167 +58,34 @@ export default function CompaniesPage() {
     },
   };
 
-  // Companies data with real Unsplash images
-  const companies = [
-    {
-      id: 1,
-      name: "Elite Motors Sri Lanka",
-      category: "Luxury",
-      image:
-        "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.0.3",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?q=80&w=1469&auto=format&fit=crop&w=100&h=100&ixlib=rb-4.0.3",
-      rating: 4.9,
-      reviews: 324,
-      fleetSize: "150+",
-      established: "2010",
-      locations: ["Colombo", "Kandy", "Galle"],
-      description:
-        "Premium luxury car rental service with high-end vehicles and exceptional customer service.",
-      features: [
-        "24/7 Support",
-        "Chauffeur Service",
-        "Airport Pickup",
-        "Insurance Included",
-      ],
-      phone: "+94 11 234 5678",
-      email: "info@elitemotors.lk",
-      website: "www.elitemotors.lk",
-      verified: true,
-      featured: true,
-    },
-    {
-      id: 2,
-      name: "Budget Car Rentals",
-      category: "Economy",
-      image:
-        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?q=80&w=1469&auto=format&fit=crop&w=100&h=100&ixlib=rb-4.0.3",
-      rating: 4.6,
-      reviews: 856,
-      fleetSize: "300+",
-      established: "2008",
-      locations: ["Colombo", "Negombo", "Kandy", "Galle", "Jaffna"],
-      description:
-        "Affordable car rental solutions for budget-conscious travelers across Sri Lanka.",
-      features: [
-        "Best Price Guarantee",
-        "Free Cancellation",
-        "Multiple Locations",
-        "Online Booking",
-      ],
-      phone: "+94 11 567 8901",
-      email: "bookings@budgetcars.lk",
-      website: "www.budgetcars.lk",
-      verified: true,
-      featured: false,
-    },
-    {
-      id: 3,
-      name: "Green Drive Eco Rentals",
-      category: "Electric/Hybrid",
-      image:
-        "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.0.3",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?q=80&w=1469&auto=format&fit=crop&w=100&h=100&ixlib=rb-4.0.3",
-      rating: 4.8,
-      reviews: 198,
-      fleetSize: "80+",
-      established: "2020",
-      locations: ["Colombo", "Mount Lavinia"],
-      description:
-        "Sri Lanka's first fully electric and hybrid vehicle rental company promoting sustainable transportation.",
-      features: [
-        "Eco-Friendly Fleet",
-        "Carbon Neutral",
-        "Charging Stations",
-        "Green Certification",
-      ],
-      phone: "+94 11 789 0123",
-      email: "hello@greendrive.lk",
-      website: "www.greendrive.lk",
-      verified: true,
-      featured: true,
-    },
-    {
-      id: 4,
-      name: "Family Van Rentals",
-      category: "Family/Van",
-      image:
-        "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=1474&auto=format&fit=crop&ixlib=rb-4.0.3",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?q=80&w=1469&auto=format&fit=crop&w=100&h=100&ixlib=rb-4.0.3",
-      rating: 4.7,
-      reviews: 445,
-      fleetSize: "120+",
-      established: "2015",
-      locations: ["Colombo", "Kandy", "Anuradhapura"],
-      description:
-        "Specialized in family-friendly vehicles and group transportation with spacious vans and SUVs.",
-      features: [
-        "Child Safety Seats",
-        "Group Discounts",
-        "Large Capacity",
-        "Tour Packages",
-      ],
-      phone: "+94 11 345 6789",
-      email: "family@vanrentals.lk",
-      website: "www.familyvanrentals.lk",
-      verified: true,
-      featured: false,
-    },
-    {
-      id: 5,
-      name: "Sports Car Paradise",
-      category: "Sports/Luxury",
-      image:
-        "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=1474&auto=format&fit=crop&ixlib=rb-4.0.3",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?q=80&w=1469&auto=format&fit=crop&w=100&h=100&ixlib=rb-4.0.3",
-      rating: 4.9,
-      reviews: 127,
-      fleetSize: "45+",
-      established: "2018",
-      locations: ["Colombo", "Bentota"],
-      description:
-        "Exclusive collection of sports cars and supercars for special occasions and luxury experiences.",
-      features: [
-        "Exotic Cars",
-        "Special Events",
-        "Photo Shoots",
-        "VIP Service",
-      ],
-      phone: "+94 11 456 7890",
-      email: "luxury@sportscarparadise.lk",
-      website: "www.sportscarparadise.lk",
-      verified: true,
-      featured: true,
-    },
-    {
-      id: 6,
-      name: "City Express Rentals",
-      category: "Business",
-      image:
-        "https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?q=80&w=1469&auto=format&fit=crop&w=100&h=100&ixlib=rb-4.0.3",
-      rating: 4.5,
-      reviews: 612,
-      fleetSize: "200+",
-      established: "2012",
-      locations: ["Colombo", "Kandy", "Galle", "Matara"],
-      description:
-        "Professional car rental service catering to business travelers and corporate clients.",
-      features: [
-        "Corporate Rates",
-        "Monthly Rentals",
-        "Airport Service",
-        "Professional Drivers",
-      ],
-      phone: "+94 11 678 9012",
-      email: "corporate@cityexpress.lk",
-      website: "www.cityexpress.lk",
-      verified: true,
-      featured: false,
-    },
-  ];
+  // Load companies from API
+  useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  // Filter companies based on current filters
+        // Convert frontend filters to API format
+        const apiFilters: any = {};
+        if (filters.category) apiFilters.category = filters.category;
+        if (filters.location) apiFilters.location = filters.location;
+        if (filters.rating) apiFilters.minRating = filters.rating.replace('+', '');
+        if (filters.search) apiFilters.search = filters.search;
+
+        const response = await companiesApi.getAll(apiFilters);
+        setCompanies(response.companies);
+      } catch (err) {
+        setError("Failed to load companies. Please try again.");
+        console.error("Error loading companies:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCompanies();
+  }, [filters]);
+
+  // Filter companies based on current filters (client-side)
   const filteredCompanies = companies.filter((company) => {
     const matchesLocation =
       !filters.location ||
@@ -225,8 +96,7 @@ export default function CompaniesPage() {
       !filters.category || company.category === filters.category;
     const matchesSearch =
       !filters.search ||
-      company.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-      company.description.toLowerCase().includes(filters.search.toLowerCase());
+      company.name.toLowerCase().includes(filters.search.toLowerCase());
 
     let matchesRating = true;
     if (filters.rating) {
@@ -255,6 +125,43 @@ export default function CompaniesPage() {
       search: "",
     });
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen gradient-background text-gray-900">
+        <Navbar onLoginClick={() => setLoginOpen(true)} />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading companies...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen gradient-background text-gray-900">
+        <Navbar onLoginClick={() => setLoginOpen(true)} />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="text-red-500 text-xl mb-4">{error}</div>
+            <Button
+              onClick={() => window.location.reload()}
+              className="gradient-primary gradient-primary-hover text-black"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-background text-gray-900">
@@ -302,7 +209,7 @@ export default function CompaniesPage() {
             {[
               {
                 icon: <Building className="w-8 h-8" />,
-                number: "50+",
+                number: `${companies.length}+`,
                 label: "Partner Companies",
               },
               {
@@ -451,18 +358,10 @@ export default function CompaniesPage() {
               animate="visible"
               className="grid grid-cols-1 lg:grid-cols-2 gap-8"
             >
-              {filteredCompanies.map((company, index) => (
-                <motion.div key={company.id} variants={itemVariants}>
+              {filteredCompanies.map((company) => (
+                <motion.div key={company._id} variants={itemVariants}>
                   <Card className="overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group h-full">
-                    <div className="relative overflow-hidden">
-                      {/* <Image
-                        src={company.image}
-                        alt={company.name}
-                        width={600}
-                        height={250}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                      /> */}
-
+                    <div className="relative overflow-hidden h-48 bg-gradient-to-br from-gray-100 to-gray-200">
                       {/* Badges */}
                       <div className="absolute top-4 left-4 flex space-x-2">
                         {company.verified && (
@@ -480,14 +379,8 @@ export default function CompaniesPage() {
                       </div>
 
                       {/* Company Logo */}
-                      <div className="absolute top-4 right-4 w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-lg">
-                        <Image
-                          src={company.logo}
-                          alt={`${company.name} logo`}
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="absolute top-4 right-4 w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-lg bg-white flex items-center justify-center">
+                        <Building className="w-6 h-6 text-gray-400" />
                       </div>
                     </div>
 
@@ -504,27 +397,27 @@ export default function CompaniesPage() {
                         <div className="flex items-center space-x-1">
                           <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                           <span className="text-sm font-medium">
-                            {company.rating}
+                            {company.rating || 4.5}
                           </span>
                           <span className="text-xs text-gray-500">
-                            ({company.reviews})
+                            ({company.reviews || 0})
                           </span>
                         </div>
                       </div>
 
                       <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                        {company.description}
+                        Professional car rental service offering {company.category.toLowerCase()} vehicles with excellent customer service.
                       </p>
 
                       {/* Company Info */}
                       <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                         <div className="flex items-center space-x-2 text-gray-600">
                           <Car className="w-4 h-4" />
-                          <span>{company.fleetSize} vehicles</span>
+                          <span>Fleet Available</span>
                         </div>
                         <div className="flex items-center space-x-2 text-gray-600">
                           <Clock className="w-4 h-4" />
-                          <span>Since {company.established}</span>
+                          <span>Active Partner</span>
                         </div>
                       </div>
 
@@ -545,7 +438,7 @@ export default function CompaniesPage() {
                       {/* Features */}
                       <div className="mb-4">
                         <div className="flex flex-wrap gap-2">
-                          {company.features.slice(0, 2).map((feature, idx) => (
+                          {company.features?.slice(0, 2).map((feature, idx) => (
                             <div
                               key={idx}
                               className="flex items-center space-x-1 text-xs text-green-600"
@@ -554,7 +447,7 @@ export default function CompaniesPage() {
                               <span>{feature}</span>
                             </div>
                           ))}
-                          {company.features.length > 2 && (
+                          {company.features && company.features.length > 2 && (
                             <span className="text-xs text-gray-500">
                               +{company.features.length - 2} more
                             </span>

@@ -20,5 +20,5 @@ export function requireRole(role: string | string[]) {
 
 // Specific role middleware functions
 export const requireAdmin = requireRole('admin');
-export const requireRentShop = requireRole(['admin', 'rent-shop']);
+export const requireRentCompany = requireRole(['admin', 'rental-company']);
 export const requireCustomer = requireRole(['admin', 'customer']);

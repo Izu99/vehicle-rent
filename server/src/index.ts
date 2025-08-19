@@ -44,6 +44,9 @@ app.use(
     res.status(500).json({ error: 'Something went wrong!' });
   }
 );
+import companyRoutes from './routes/rentalCompanyRoutes';
+app.use('/api', companyRoutes);
+
 
 // 404 handler
 app.use(/.*/, (_req, res) => {
