@@ -89,7 +89,7 @@ export default function CompanyPage() {
   // Check if user has proper role (this is backup to middleware)
   if (user.role !== 'rental-company' && user.role !== 'admin') {
     return <UnauthorizedAccess />
-  }
+  } 
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

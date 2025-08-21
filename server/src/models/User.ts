@@ -1,4 +1,4 @@
-import mongoose, { Document, Types } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose'; 
 import bcrypt from 'bcrypt';
 
 export type Role = 'customer' | 'rental-company' | 'admin';

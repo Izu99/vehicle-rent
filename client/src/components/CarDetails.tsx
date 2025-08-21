@@ -8,34 +8,21 @@ import { motion } from "framer-motion";
 import {
   X,
   Calendar,
-  Settings,
   Users,
-  Fuel,
   Car,
   CheckCircle,
-  MapPin,
   Heart,
   ChevronLeft,
   ChevronRight,
   Star,
-  Phone,
-  Mail,
-  Zap,
   Shield,
 } from "lucide-react";
 
-interface CompanyInfo {
-  locations: any;
-  _id: string;
-  name: string; // <- Correct field, not CompanyName
-  address: string; // <- Correct field, not CompanyAddress
-  phone: string;
-  email: string;
-}
-
 interface CarData {
   _id: string;
-  companyId: CompanyInfo;
+  companyId: string;
+  vehicleCategory: string;
+  vehicleSubCategory: string;
   brand: string;
   carModel: string;
   year: number;
@@ -44,7 +31,7 @@ interface CarData {
   transmission: "Manual" | "Automatic";
   seatingCapacity: number;
   engineSize: string;
-  mileage: string;
+  fuelConsumption: string;
   pricePerDay: number;
   pricePerWeek?: number;
   pricePerMonth?: number;
@@ -54,7 +41,6 @@ interface CarData {
   sunroof: boolean;
   images: string[];
   isAvailable: boolean;
-  description?: string;
   licensePlate: string;
   createdAt: string;
   updatedAt: string;
@@ -64,12 +50,14 @@ interface CarDetailsModalProps {
   isOpen: boolean;
   car: CarData | null;
   onClose: () => void;
+  userRole?: "customer" | "rental-shop"; // Add role prop
 }
 
 export default function CarDetailsModal({
   isOpen,
   car,
   onClose,
+  userRole = "customer", // Default to customer
 }: CarDetailsModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -107,7 +95,6 @@ export default function CarDetailsModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
-      {/* Modal Content */}
       <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -124,7 +111,7 @@ export default function CarDetailsModal({
         </button>
 
         <div className="overflow-y-auto max-h-[90vh] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          {/* Simple Header - Just car name and availability */}
+          {/* Header */}
           <div className="bg-gradient-to-br from-primary/90 via-primary to-accent text-black p-6 pb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -152,7 +139,7 @@ export default function CarDetailsModal({
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 bg-gradient-to-br from-gray-50 to-gray-100">
-            {/* Left Column - Images & Description (2/3 width) */}
+            {/* Left Column - Images (2/3 width) */}
             <div className="lg:col-span-2">
               {/* Main Image */}
               <div className="relative h-80 rounded-2xl overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200">
@@ -224,17 +211,7 @@ export default function CarDetailsModal({
                 </div>
               )}
 
-              {/* Description */}
-              {car.description && (
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 mb-6">
-                  <h3 className="font-bold text-gray-900 mb-3">Description</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {car.description}
-                  </p>
-                </div>
-              )}
-
-              {/* Complete Pricing Section */}
+              {/* Pricing Section */}
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
                 <h3 className="font-bold text-gray-900 mb-4 flex items-center">
                   <Calendar className="w-5 h-5 mr-2 text-primary" />
@@ -299,15 +276,27 @@ export default function CarDetailsModal({
               </div>
             </div>
 
-            {/* Right Column - All Details (1/3 width) */}
+            {/* Right Column - Vehicle Details (1/3 width) */}
             <div className="space-y-4">
-              {/* Vehicle Overview - Complete specs in one place */}
+              {/* Vehicle Overview */}
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
                 <h3 className="font-bold text-gray-900 mb-4 flex items-center">
                   <Car className="w-5 h-5 mr-2 text-primary" />
                   Vehicle Details
                 </h3>
                 <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">Category</span>
+                    <span className="font-semibold text-gray-900 capitalize">
+                      {car.vehicleCategory}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">Type</span>
+                    <span className="font-semibold text-gray-900 capitalize">
+                      {car.vehicleSubCategory}
+                    </span>
+                  </div>
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span className="text-sm text-gray-600">Year</span>
                     <span className="font-semibold text-gray-900">
@@ -316,7 +305,7 @@ export default function CarDetailsModal({
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span className="text-sm text-gray-600">Color</span>
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold text-gray-900 capitalize">
                       {car.color}
                     </span>
                   </div>
@@ -344,18 +333,24 @@ export default function CarDetailsModal({
                       {car.engineSize}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-600">Mileage</span>
-                    <span className="font-semibold text-gray-900">
-                      {car.mileage}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-sm text-gray-600">License</span>
-                    <span className="font-semibold text-gray-900">
-                      {car.licensePlate}
-                    </span>
-                  </div>
+                  
+                  {/* Show these fields only for rental-shop role */}
+                  {userRole === "rental-shop" && (
+                    <>
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span className="text-sm text-gray-600">Fuel Consumption</span>
+                        <span className="font-semibold text-gray-900">
+                          {car.fuelConsumption}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm text-gray-600">License Plate</span>
+                        <span className="font-semibold text-gray-900">
+                          {car.licensePlate}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -409,60 +404,36 @@ export default function CarDetailsModal({
                 </div>
               </div>
 
-              {/* Rental Partner */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200">
-                <h3 className="font-bold text-gray-900 mb-4">Rental Partner</h3>
-                <div className="space-y-4">
-                  {/* Company Name */}
-                  <div className="font-semibold text-gray-900">
-                    {car.companyId?.name ?? "Unknown"}
-                  </div>
+              {/* Action Buttons - Only show for customers */}
+              {userRole === "customer" && (
+                <div className="space-y-3 sticky bottom-0 bg-gradient-to-br from-gray-50 to-gray-100 pt-4">
+                  <Button
+                    className={`w-full py-3 font-bold rounded-xl transition-all duration-300 ${
+                      car.isAvailable
+                        ? "gradient-primary gradient-primary-hover text-black shadow-lg hover:shadow-xl"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                    disabled={!car.isAvailable}
+                  >
+                    {car.isAvailable ? (
+                      <>
+                        <Calendar className="w-5 h-5 mr-2" />
+                        Book Now - ${car.pricePerDay}/day
+                      </>
+                    ) : (
+                      "Currently Not Available"
+                    )}
+                  </Button>
 
-                  {/* Address/Location */}
-                  <p className="text-sm text-gray-600 leading-relaxed break-words">
-                    {car.companyId?.locations?.[0] ?? "Unknown"}
-                  </p>
-
-                  {/* Phone - SAFE */}
-                  <span className="text-sm text-gray-600">
-                    {car.companyId?.phone ?? "Not available"}
-                  </span>
-
-                  {/* Email - SAFE */}
-                  <p className="text-sm text-gray-600 break-all">
-                    {car.companyId?.email ?? "Not available"}
-                  </p>
+                  <Button
+                    variant="outline"
+                    className="w-full py-3 font-bold rounded-xl border-2 border-primary/30 text-primary hover:bg-primary hover:text-black transition-all duration-300"
+                  >
+                    <Heart className="w-5 h-5 mr-2" />
+                    Add to Favorites
+                  </Button>
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space- sticky bottom-0 bg-gradient-to-br from-gray-50 to-gray-100 pt-4">
-                <Button
-                  className={`w-full py-3 font-bold rounded-xl transition-all duration-300 ${
-                    car.isAvailable
-                      ? "gradient-primary gradient-primary-hover text-black shadow-lg hover:shadow-xl"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                  disabled={!car.isAvailable}
-                >
-                  {car.isAvailable ? (
-                    <>
-                      <Calendar className="w-5 h-5 mr-2" />
-                      Book Now - ${car.pricePerDay}/day
-                    </>
-                  ) : (
-                    "Currently Not Available"
-                  )}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="w-full py-3 font-bold rounded-xl border-2 border-primary/30 text-primary hover:bg-primary hover:text-black transition-all duration-300"
-                >
-                  <Heart className="w-5 h-5 mr-2" />
-                  Add to Favorites
-                </Button>
-              </div>
+              )}
             </div>
           </div>
         </div>

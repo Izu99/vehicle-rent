@@ -33,7 +33,7 @@ interface Car {
   transmission: CarType["transmission"];
   seatingCapacity: number;
   engineSize: string;
-  mileage: string;
+  fuelConsumption: string;
   pricePerDay: number;
   pricePerWeek?: number;
   pricePerMonth?: number;
@@ -59,7 +59,7 @@ interface CarDataForAddModal {
   transmission: "Manual" | "Automatic";
   seatingCapacity: number;
   engineSize: string;
-  mileage: string;
+  fuelConsumption: string;
   pricePerDay: number;
   pricePerWeek?: number;
   pricePerMonth?: number;

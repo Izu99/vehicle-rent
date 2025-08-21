@@ -1,4 +1,4 @@
-// lib/api/cars.ts
+// lib/api/cars.ts 
 
 import { apiClient } from './index'; // Make sure ./index exports apiClient (axios or fetch wrapper)
 
@@ -22,7 +22,7 @@ export interface Car {
   transmission: 'Manual' | 'Automatic';
   seatingCapacity: number;
   engineSize: string;
-  mileage: string;
+  fuelConsumption: string;
   pricePerDay: number;
   pricePerWeek?: number;
   pricePerMonth?: number;

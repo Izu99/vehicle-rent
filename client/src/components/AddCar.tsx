@@ -5,15 +5,22 @@ import { X, Upload, Plus, Save, AlertCircle } from "lucide-react"
 
 interface Car {
   _id: string
+  vehicleCategory: 'car' | 'van' | 'lorry' | 'bus'
+  vehicleSubCategory?: 'flex' | 'mini' | 'regular'
   brand: string
   carModel: string
   year: number
   color: string
-  fuelType: 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid'
-  transmission: 'Manual' | 'Automatic'
-  seatingCapacity: number
-  engineSize: string
-  mileage: string
+  fuelType?: 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid'
+  transmission?: 'Manual' | 'Automatic'
+  seatingCapacity?: number
+  engineSize?: string
+  fuelConsumption?: string
+  dimensions?: {
+    length: number
+    width: number
+    height: number
+  }
   pricePerDay: number
   pricePerWeek?: number
   pricePerMonth?: number
@@ -30,11 +37,13 @@ interface AddCarModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
-  editCar?: Car | null // ✅ Optional car data for editing
-  mode?: 'add' | 'edit' // ✅ Mode to determine behavior
+  editCar?: Car | null
+  mode?: 'add' | 'edit'
 }
 
 interface CarFormData {
+  vehicleCategory: 'car' | 'van' | 'lorry' | 'bus' | ''
+  vehicleSubCategory: 'flex' | 'mini' | 'regular' | ''
   brand: string
   carModel: string
   year: string
@@ -43,7 +52,12 @@ interface CarFormData {
   transmission: 'Manual' | 'Automatic' | ''
   seatingCapacity: string
   engineSize: string
-  mileage: string
+  fuelConsumption: string
+  dimensions: {
+    length: string
+    width: string
+    height: string
+  }
   pricePerDay: string
   pricePerWeek: string
   pricePerMonth: string
@@ -68,19 +82,25 @@ export default function AddCarModal({
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [existingImages, setExistingImages] = useState<string[]>([])
 
-  // ✅ Initialize form data based on mode
   const getInitialFormData = (): CarFormData => {
     if (mode === 'edit' && editCar) {
       return {
+        vehicleCategory: editCar.vehicleCategory,
+        vehicleSubCategory: editCar.vehicleSubCategory || '',
         brand: editCar.brand,
         carModel: editCar.carModel,
         year: editCar.year.toString(),
         color: editCar.color,
-        fuelType: editCar.fuelType,
-        transmission: editCar.transmission,
-        seatingCapacity: editCar.seatingCapacity.toString(),
-        engineSize: editCar.engineSize,
-        mileage: editCar.mileage,
+        fuelType: editCar.fuelType || '',
+        transmission: editCar.transmission || '',
+        seatingCapacity: editCar.seatingCapacity?.toString() || '',
+        engineSize: editCar.engineSize || '',
+        fuelConsumption: editCar.fuelConsumption || '',
+        dimensions: {
+          length: editCar.dimensions?.length?.toString() || '',
+          width: editCar.dimensions?.width?.toString() || '',
+          height: editCar.dimensions?.height?.toString() || ''
+        },
         pricePerDay: editCar.pricePerDay.toString(),
         pricePerWeek: editCar.pricePerWeek?.toString() || '',
         pricePerMonth: editCar.pricePerMonth?.toString() || '',
@@ -93,8 +113,9 @@ export default function AddCarModal({
       }
     }
     
-    // Default form data for add mode
     return {
+      vehicleCategory: '',
+      vehicleSubCategory: '',
       brand: '',
       carModel: '',
       year: '',
@@ -103,7 +124,12 @@ export default function AddCarModal({
       transmission: '',
       seatingCapacity: '',
       engineSize: '',
-      mileage: '',
+      fuelConsumption: '',
+      dimensions: {
+        length: '',
+        width: '',
+        height: ''
+      },
       pricePerDay: '',
       pricePerWeek: '',
       pricePerMonth: '',
@@ -118,7 +144,6 @@ export default function AddCarModal({
 
   const [formData, setFormData] = useState<CarFormData>(getInitialFormData())
 
-  // ✅ Reset form when modal opens/closes or editCar changes
   useEffect(() => {
     if (isOpen) {
       const initialData = getInitialFormData()
@@ -127,7 +152,6 @@ export default function AddCarModal({
       setImages([])
       setImagePreviews([])
       
-      // ✅ Load existing images for edit mode
       if (mode === 'edit' && editCar?.images) {
         setExistingImages(editCar.images)
       } else {
@@ -142,8 +166,22 @@ export default function AddCarModal({
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked
       setFormData(prev => ({ ...prev, [name]: checked }))
+    } else if (name.startsWith('dimensions.')) {
+      const dimensionKey = name.split('.')[1]
+      setFormData(prev => ({
+        ...prev,
+        dimensions: {
+          ...prev.dimensions,
+          [dimensionKey]: value
+        }
+      }))
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
+      
+      // Reset sub-category when vehicle category changes
+      if (name === 'vehicleCategory') {
+        setFormData(prev => ({ ...prev, vehicleSubCategory: '' }))
+      }
     }
   }
 
@@ -185,27 +223,67 @@ export default function AddCarModal({
     setExistingImages(prev => prev.filter((_, i) => i !== index))
   }
 
+  const getAvailableSubCategories = () => {
+    if (formData.vehicleCategory === 'car') {
+      return [
+        { value: 'flex', label: 'Flex Car' },
+        { value: 'mini', label: 'Mini Car' },
+        { value: 'regular', label: 'Regular Car' }
+      ]
+    } else if (formData.vehicleCategory === 'van') {
+      return [
+        { value: 'mini', label: 'Mini Van' },
+        { value: 'regular', label: 'Regular Van' }
+      ]
+    }
+    return []
+  }
+
+  const requiresSubCategory = formData.vehicleCategory === 'car' || formData.vehicleCategory === 'van'
+  const isLorry = formData.vehicleCategory === 'lorry'
+  const availableSubCategories = getAvailableSubCategories()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError('')
 
     try {
-      const requiredFields = ['brand', 'carModel', 'year', 'color', 'fuelType', 'transmission', 'seatingCapacity', 'engineSize', 'mileage', 'pricePerDay', 'licensePlate']
-      const missingFields = requiredFields.filter(field => !formData[field as keyof CarFormData])
+      const basicRequiredFields = ['vehicleCategory', 'brand', 'carModel', 'year', 'color', 'pricePerDay', 'licensePlate']
+      const missingBasicFields = basicRequiredFields.filter(field => !formData[field as keyof CarFormData])
       
-      if (missingFields.length > 0) {
-        setError(`Please fill in: ${missingFields.join(', ')}`)
+      if (missingBasicFields.length > 0) {
+        setError(`Please fill in: ${missingBasicFields.join(', ')}`)
         return
       }
 
-      // ✅ For add mode, require at least one image
+      // Validate sub-category for car and van
+      if (requiresSubCategory && !formData.vehicleSubCategory) {
+        const categoryName = formData.vehicleCategory === 'car' ? 'car' : 'van'
+        const options = formData.vehicleCategory === 'car' ? 'flex, mini, or regular' : 'mini or regular'
+        setError(`Please select ${categoryName} sub-category (${options})`)
+        return
+      }
+
+      // Validate lorry dimensions
+      if (formData.vehicleCategory === 'lorry') {
+        if (!formData.dimensions.length || !formData.dimensions.width || !formData.dimensions.height) {
+          setError('Please fill in all dimensions for lorry (length, width, height)')
+          return
+        }
+      } else {
+        // Validate other vehicle fields
+        if (!formData.fuelType || !formData.transmission || !formData.seatingCapacity || !formData.engineSize || !formData.fuelConsumption) {
+          setError('Please fill in fuel type, transmission, seating capacity, engine size, and fuel consumption')
+          return
+        }
+      }
+
       if (mode === 'add' && images.length === 0) {
         setError('At least one image is required')
         return
       }
 
-      // ✅ For edit mode, check if we have existing images or new images
       if (mode === 'edit' && existingImages.length === 0 && images.length === 0) {
         setError('At least one image is required')
         return
@@ -219,53 +297,55 @@ export default function AddCarModal({
 
       let response: Response
 
-      if (mode === 'edit' && editCar) {
-        // ✅ Edit mode - PUT request
-        if (images.length > 0) {
-          // If new images are uploaded, use FormData
-          const submitData = new FormData()
-          
-          Object.entries(formData).forEach(([key, value]) => {
-            submitData.append(key, value.toString())
-          })
-          
-          images.forEach(image => {
-            submitData.append('images', image)
-          })
+      // Prepare submit data
+      const submitData = new FormData()
+      
+      // Add basic fields
+      submitData.append('vehicleCategory', formData.vehicleCategory)
+      if (requiresSubCategory && formData.vehicleSubCategory) {
+        submitData.append('vehicleSubCategory', formData.vehicleSubCategory)
+      }
+      submitData.append('brand', formData.brand)
+      submitData.append('carModel', formData.carModel)
+      submitData.append('year', formData.year)
+      submitData.append('color', formData.color)
+      submitData.append('pricePerDay', formData.pricePerDay)
+      if (formData.pricePerWeek) submitData.append('pricePerWeek', formData.pricePerWeek)
+      if (formData.pricePerMonth) submitData.append('pricePerMonth', formData.pricePerMonth)
+      submitData.append('licensePlate', formData.licensePlate)
+      submitData.append('description', formData.description)
+      submitData.append('airConditioning', formData.airConditioning.toString())
+      submitData.append('bluetooth', formData.bluetooth.toString())
+      submitData.append('gps', formData.gps.toString())
+      submitData.append('sunroof', formData.sunroof.toString())
 
-          response = await fetch(`http://localhost:5000/api/cars/${editCar._id}`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            body: submitData
-          })
-        } else {
-          // If no new images, send JSON data only
-          response = await fetch(`http://localhost:5000/api/cars/${editCar._id}`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              ...formData,
-              images: existingImages // Keep existing images
-            })
-          })
-        }
+      // Add category-specific fields
+      if (formData.vehicleCategory === 'lorry') {
+        submitData.append('dimensions[length]', formData.dimensions.length)
+        submitData.append('dimensions[width]', formData.dimensions.width)
+        submitData.append('dimensions[height]', formData.dimensions.height)
       } else {
-        // ✅ Add mode - POST request
-        const submitData = new FormData()
-        
-        Object.entries(formData).forEach(([key, value]) => {
-          submitData.append(key, value.toString())
-        })
-        
-        images.forEach(image => {
-          submitData.append('images', image)
-        })
+        submitData.append('fuelType', formData.fuelType)
+        submitData.append('transmission', formData.transmission)
+        submitData.append('seatingCapacity', formData.seatingCapacity)
+        submitData.append('engineSize', formData.engineSize)
+        submitData.append('fuelConsumption', formData.fuelConsumption)
+      }
 
+      // Add images
+      images.forEach(image => {
+        submitData.append('images', image)
+      })
+
+      if (mode === 'edit' && editCar) {
+        response = await fetch(`http://localhost:5000/api/cars/${editCar._id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: submitData
+        })
+      } else {
         response = await fetch('http://localhost:5000/api/cars', {
           method: 'POST',
           headers: {
@@ -329,6 +409,52 @@ export default function AddCarModal({
           )}
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* Vehicle Type Selection */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Type</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Category *</label>
+                  <select
+                    name="vehicleCategory"
+                    value={formData.vehicleCategory}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select vehicle category</option>
+                    <option value="car">Car</option>
+                    <option value="van">Van</option>
+                    <option value="lorry">Lorry</option>
+                    <option value="bus">Bus</option>
+                  </select>
+                </div>
+
+                {/* Sub-category for cars and vans */}
+                {requiresSubCategory && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {formData.vehicleCategory === 'car' ? 'Car' : 'Van'} Sub-category *
+                    </label>
+                    <select
+                      name="vehicleSubCategory"
+                      value={formData.vehicleSubCategory}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select {formData.vehicleCategory} type</option>
+                      {availableSubCategories.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Basic Information */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
@@ -395,83 +521,138 @@ export default function AddCarModal({
               </div>
             </div>
 
-            {/* Specifications */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Fuel Type *</label>
-                  <select
-                    name="fuelType"
-                    value={formData.fuelType}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    required
-                  >
-                    <option value="">Select fuel type</option>
-                    <option value="Petrol">Petrol</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="Electric">Electric</option>
-                    <option value="Hybrid">Hybrid</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Transmission *</label>
-                  <select
-                    name="transmission"
-                    value={formData.transmission}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    required
-                  >
-                    <option value="">Select transmission</option>
-                    <option value="Manual">Manual</option>
-                    <option value="Automatic">Automatic</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Seating Capacity *</label>
-                  <select
-                    name="seatingCapacity"
-                    value={formData.seatingCapacity}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    required
-                  >
-                    <option value="">Select capacity</option>
-                    <option value="2">2 Seats</option>
-                    <option value="4">4 Seats</option>
-                    <option value="5">5 Seats</option>
-                    <option value="7">7 Seats</option>
-                    <option value="8">8 Seats</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Engine Size *</label>
-                  <input
-                    type="text"
-                    name="engineSize"
-                    value={formData.engineSize}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="e.g., 2.0L"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Mileage *</label>
-                  <input
-                    type="text"
-                    name="mileage"
-                    value={formData.mileage}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="e.g., 15 km/l"
-                    required
-                  />
+            {/* Lorry Dimensions */}
+            {isLorry && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Dimensions (in feet)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Length (ft) *</label>
+                    <input
+                      type="number"
+                      name="dimensions.length"
+                      value={formData.dimensions.length}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.1"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="e.g., 20"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Width (ft) *</label>
+                    <input
+                      type="number"
+                      name="dimensions.width"
+                      value={formData.dimensions.width}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.1"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="e.g., 8"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Height (ft) *</label>
+                    <input
+                      type="number"
+                      name="dimensions.height"
+                      value={formData.dimensions.height}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.1"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="e.g., 10"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Specifications for non-lorry vehicles */}
+            {!isLorry && formData.vehicleCategory && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Fuel Type *</label>
+                    <select
+                      name="fuelType"
+                      value={formData.fuelType}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select fuel type</option>
+                      <option value="Petrol">Petrol</option>
+                      <option value="Diesel">Diesel</option>
+                      <option value="Electric">Electric</option>
+                      <option value="Hybrid">Hybrid</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Transmission *</label>
+                    <select
+                      name="transmission"
+                      value={formData.transmission}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select transmission</option>
+                      <option value="Manual">Manual</option>
+                      <option value="Automatic">Automatic</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Seating Capacity *</label>
+                    <input
+                      type="number"
+                      name="seatingCapacity"
+                      value={formData.seatingCapacity}
+                      onChange={handleInputChange}
+                      min="2"
+                      max="50"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="e.g., 5"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Engine Size *</label>
+                    <input
+                      type="text"
+                      name="engineSize"
+                      value={formData.engineSize}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="e.g., 2.0L"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Fuel Consumption (km/l) *</label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        name="fuelConsumption"
+                        value={formData.fuelConsumption}
+                        onChange={handleInputChange}
+                        min="0"
+                        step="0.1"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-12"
+                        placeholder="15"
+                        required
+                      />
+                      <span className="absolute right-3 top-2 text-gray-500 text-sm">km/l</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Pricing */}
             <div>
@@ -547,7 +728,7 @@ export default function AddCarModal({
                 Vehicle Images {!isEditMode && '*'}
               </h3>
               
-              {/* ✅ Show existing images in edit mode */}
+              {/* Show existing images in edit mode */}
               {isEditMode && existingImages.length > 0 && (
                 <div className="mb-4">
                   <p className="text-sm text-gray-600 mb-2">Current Images:</p>
@@ -591,7 +772,7 @@ export default function AddCarModal({
                 </label>
               </div>
 
-              {/* ✅ Show new image previews */}
+              {/* Show new image previews */}
               {imagePreviews.length > 0 && (
                 <div className="mt-4">
                   <p className="text-sm text-gray-600 mb-2">New Images:</p>

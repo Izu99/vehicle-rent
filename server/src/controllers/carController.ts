@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { Car } from '../models/Car';
-import { RentalCompany } from '../models/RentalCompany'; // <-- Updated import
+import { RentalCompany } from '../models/RentalCompany';
 import fs from 'fs';
 
 //
-// Add new car with images
-// Only rental-company users with rental company can add cars
+// Add new vehicle with images
+// Only rental-company users with rental company can add vehicles
 //
 export const addCar = async (req: Request, res: Response) => {
   try {
@@ -20,7 +20,7 @@ export const addCar = async (req: Request, res: Response) => {
         });
       }
       return res.status(403).json({
-        message: 'Access denied. Only rental company owners can add cars.',
+        message: 'Access denied. Only rental company owners can add vehicles.',
         error: 'INSUFFICIENT_PERMISSIONS',
       });
     }
@@ -45,13 +45,15 @@ export const addCar = async (req: Request, res: Response) => {
     // Image check
     if (!uploadedFiles || uploadedFiles.length === 0) {
       return res.status(400).json({
-        message: 'At least one car image is required',
+        message: 'At least one vehicle image is required',
         error: 'NO_IMAGES_UPLOADED',
       });
     }
 
-    // Extract and validate car fields
+    // Extract fields
     const {
+      vehicleCategory,
+      vehicleSubCategory,
       brand,
       carModel,
       year,
@@ -60,7 +62,8 @@ export const addCar = async (req: Request, res: Response) => {
       transmission,
       seatingCapacity,
       engineSize,
-      mileage,
+      fuelConsumption,
+      dimensions,
       pricePerDay,
       pricePerWeek,
       pricePerMonth,
@@ -72,16 +75,13 @@ export const addCar = async (req: Request, res: Response) => {
       licensePlate,
     } = req.body;
 
+    // Basic validation
     if (
+      !vehicleCategory ||
       !brand ||
       !carModel ||
       !year ||
       !color ||
-      !fuelType ||
-      !transmission ||
-      !seatingCapacity ||
-      !engineSize ||
-      !mileage ||
       !pricePerDay ||
       !licensePlate
     ) {
@@ -89,23 +89,99 @@ export const addCar = async (req: Request, res: Response) => {
         if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
       });
       return res.status(400).json({
-        message: 'Missing required fields',
+        message: 'Missing required basic fields',
         required: [
+          'vehicleCategory',
           'brand',
           'carModel',
           'year',
           'color',
-          'fuelType',
-          'transmission',
-          'seatingCapacity',
-          'engineSize',
-          'mileage',
           'pricePerDay',
           'licensePlate',
-          'images',
         ],
         error: 'VALIDATION_ERROR',
       });
+    }
+
+    // Sub-category validation for 'car' and 'van' categories
+    if (vehicleCategory === 'car') {
+      if (
+        !vehicleSubCategory ||
+        !['flex', 'mini', 'regular'].includes(vehicleSubCategory)
+      ) {
+        uploadedFiles.forEach((file) => {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        });
+        return res.status(400).json({
+          message:
+            'Car category requires sub-category (flex, mini, or regular)',
+          required: ['vehicleSubCategory'],
+          error: 'VALIDATION_ERROR',
+        });
+      }
+    } else if (vehicleCategory === 'van') {
+      if (
+        !vehicleSubCategory ||
+        !['mini', 'regular'].includes(vehicleSubCategory)
+      ) {
+        uploadedFiles.forEach((file) => {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        });
+        return res.status(400).json({
+          message: 'Van category requires sub-category (mini or regular)',
+          required: ['vehicleSubCategory'],
+          error: 'VALIDATION_ERROR',
+        });
+      }
+    }
+
+    // Vehicle type specific validation
+    if (vehicleCategory === 'lorry') {
+      // Only lorry needs dimensions
+      if (
+        !dimensions ||
+        !dimensions.length ||
+        !dimensions.width ||
+        !dimensions.height
+      ) {
+        uploadedFiles.forEach((file) => {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        });
+        return res.status(400).json({
+          message: 'Lorry requires dimensions (length, width, height)',
+          required: [
+            'dimensions.length',
+            'dimensions.width',
+            'dimensions.height',
+          ],
+          error: 'VALIDATION_ERROR',
+        });
+      }
+    } else {
+      // All other vehicles need these fields
+      if (
+        !fuelType ||
+        !transmission ||
+        !seatingCapacity ||
+        !engineSize ||
+        !fuelConsumption
+      ) {
+        uploadedFiles.forEach((file) => {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        });
+        return res.status(400).json({
+          message:
+            'Vehicle requires fuel type, transmission, seating capacity, engine size, and fuel consumption',
+          required: [
+            'fuelType',
+            'transmission',
+            'seatingCapacity',
+            'engineSize',
+            'fuelConsumption',
+          ],
+          error: 'VALIDATION_ERROR',
+        });
+      }
     }
 
     // License plate uniqueness
@@ -117,7 +193,7 @@ export const addCar = async (req: Request, res: Response) => {
         if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
       });
       return res.status(400).json({
-        message: 'A car with this license plate already exists',
+        message: 'A vehicle with this license plate already exists',
         error: 'DUPLICATE_LICENSE_PLATE',
       });
     }
@@ -127,49 +203,75 @@ export const addCar = async (req: Request, res: Response) => {
       (file) => `/uploads/cars/${file.filename}`,
     );
 
-    // Create Car
-    const car = new Car({
-      companyId: company._id, // <<< Changed here
+    // Create vehicle data
+    const vehicleData: any = {
+      companyId: company._id,
+      vehicleCategory,
       brand: brand.trim(),
       carModel: carModel.trim(),
       year: Number(year),
       color: color.trim(),
-      fuelType,
-      transmission,
-      seatingCapacity: Number(seatingCapacity),
-      engineSize: engineSize.trim(),
-      mileage: mileage.trim(),
       pricePerDay: Number(pricePerDay),
       pricePerWeek: pricePerWeek ? Number(pricePerWeek) : undefined,
       pricePerMonth: pricePerMonth ? Number(pricePerMonth) : undefined,
-      airConditioning: Boolean(airConditioning),
-      bluetooth: Boolean(bluetooth),
-      gps: Boolean(gps),
-      sunroof: Boolean(sunroof),
       description: description ? description.trim() : undefined,
       licensePlate: licensePlate.toUpperCase().trim(),
       images: imageUrls,
       isAvailable: true,
-    });
+      airConditioning: Boolean(airConditioning),
+      bluetooth: Boolean(bluetooth),
+      gps: Boolean(gps),
+      sunroof: Boolean(sunroof),
+    };
 
+    // Add sub-category for car and van
+    if (vehicleCategory === 'car' || vehicleCategory === 'van') {
+      vehicleData.vehicleSubCategory = vehicleSubCategory;
+    }
+
+    // Add fields based on vehicle category
+    if (vehicleCategory === 'lorry') {
+      // Only add dimensions for lorry
+      vehicleData.dimensions = {
+        length: Number(dimensions.length),
+        width: Number(dimensions.width),
+        height: Number(dimensions.height),
+      };
+    } else {
+      // Add vehicle fields for all other categories
+      vehicleData.fuelType = fuelType;
+      vehicleData.transmission = transmission;
+      vehicleData.seatingCapacity = Number(seatingCapacity);
+      vehicleData.engineSize = engineSize.trim();
+      vehicleData.fuelConsumption = fuelConsumption.trim();
+    }
+
+    // Create and save vehicle
+    const car = new Car(vehicleData);
     await car.save();
 
     // Populate company info for response
     await car.populate('companyId', 'name locations phone email');
 
+    const vehicleTypeDisplay =
+      vehicleCategory === 'car' || vehicleCategory === 'van'
+        ? `${vehicleSubCategory} ${vehicleCategory}`
+        : vehicleCategory;
+
     res.status(201).json({
       success: true,
-      message: `Car added successfully with ${imageUrls.length} images`,
+      message: `${vehicleTypeDisplay.charAt(0).toUpperCase() + vehicleTypeDisplay.slice(1)} added successfully with ${imageUrls.length} images`,
       car,
     });
   } catch (error: any) {
-    console.error('❌ Add car error:', error);
+    console.error('❌ Add vehicle error:', error);
     const uploadedFiles = req.files as Express.Multer.File[];
     if (uploadedFiles) {
       uploadedFiles.forEach((file) => {
         if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
       });
     }
+
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err: any) => err.message,
@@ -180,6 +282,7 @@ export const addCar = async (req: Request, res: Response) => {
         error: 'VALIDATION_ERROR',
       });
     }
+
     return res.status(500).json({
       message: 'Internal server error',
       error: 'SERVER_ERROR',
@@ -188,12 +291,11 @@ export const addCar = async (req: Request, res: Response) => {
 };
 
 //
-// Get all cars for a rental company
+// Get all vehicles for a rental company
 // GET /api/cars/company/:companyId
 //
-// ✅ CORRECT - GET /api/cars/company/:companyId
-export const getCompanyCars = async (req, res) => {
-  const { companyId } = req.params; // ✅ Get from URL params, NOT body
+export const getCompanyCars = async (req: Request, res: Response) => {
+  const { companyId } = req.params;
 
   try {
     // Check if company exists
@@ -205,22 +307,24 @@ export const getCompanyCars = async (req, res) => {
       });
     }
 
-    // Find cars for this company
+    // Find vehicles for this company
     const cars = await Car.find({ companyId }).populate(
       'companyId',
       'name locations phone email',
     );
 
-    // Return success with cars (even if empty array)
+    // Return success with vehicles (even if empty array)
     return res.status(200).json({
       success: true,
       cars: cars,
       total: cars.length,
       message:
-        cars.length === 0 ? 'No cars found' : `Found ${cars.length} cars`,
+        cars.length === 0
+          ? 'No vehicles found'
+          : `Found ${cars.length} vehicles`,
     });
   } catch (error) {
-    console.error('Error getting company cars:', error);
+    console.error('Error getting company vehicles:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error',
@@ -229,18 +333,24 @@ export const getCompanyCars = async (req, res) => {
 };
 
 //
-// Get all available cars with filtering and pagination
+// Get all available vehicles with filtering and pagination
 // Public endpoint
 //
 export const getAllCars = async (req: Request, res: Response) => {
   try {
     const {
+      vehicleCategory,
+      vehicleSubCategory,
       brand,
       fuelType,
       transmission,
       minPrice,
       maxPrice,
       seatingCapacity,
+      minLength,
+      maxLength,
+      minHeight,
+      maxHeight,
       page = 1,
       limit = 12,
       sortBy = 'createdAt',
@@ -248,21 +358,85 @@ export const getAllCars = async (req: Request, res: Response) => {
     } = req.query;
 
     let filter: any = { isAvailable: true };
+
+    // Vehicle category filter
+    if (
+      vehicleCategory &&
+      ['car', 'van', 'lorry', 'bus'].includes(vehicleCategory as string)
+    ) {
+      filter.vehicleCategory = vehicleCategory;
+    }
+
+    // Vehicle sub-category filter (valid for 'car' and 'van' categories)
+    if (vehicleSubCategory) {
+      if (
+        vehicleCategory === 'car' &&
+        ['flex', 'mini', 'regular'].includes(vehicleSubCategory as string)
+      ) {
+        filter.vehicleSubCategory = vehicleSubCategory;
+      } else if (
+        vehicleCategory === 'van' &&
+        ['mini', 'regular'].includes(vehicleSubCategory as string)
+      ) {
+        filter.vehicleSubCategory = vehicleSubCategory;
+      } else if (
+        !vehicleCategory &&
+        ['flex', 'mini', 'regular'].includes(vehicleSubCategory as string)
+      ) {
+        // If no specific category is selected, allow all valid sub-categories
+        filter.vehicleSubCategory = vehicleSubCategory;
+      }
+    }
+
     if (brand) filter.brand = new RegExp(brand as string, 'i');
+
+    // Only filter by fuel type for non-lorry vehicles
     if (
       fuelType &&
       ['Petrol', 'Diesel', 'Electric', 'Hybrid'].includes(fuelType as string)
-    )
+    ) {
       filter.fuelType = fuelType;
+    }
+
+    // Only filter by transmission for non-lorry vehicles
     if (
       transmission &&
       ['Manual', 'Automatic'].includes(transmission as string)
-    )
+    ) {
       filter.transmission = transmission;
+    }
+
+    // Only filter by seating capacity for non-lorry vehicles
     if (seatingCapacity) {
       const capacity = Number(seatingCapacity);
       if (!isNaN(capacity) && capacity > 0) filter.seatingCapacity = capacity;
     }
+
+    // Dimension filters for lorries
+    if (minLength || maxLength) {
+      filter['dimensions.length'] = {};
+      if (minLength) {
+        const min = Number(minLength);
+        if (!isNaN(min) && min > 0) filter['dimensions.length'].$gte = min;
+      }
+      if (maxLength) {
+        const max = Number(maxLength);
+        if (!isNaN(max) && max > 0) filter['dimensions.length'].$lte = max;
+      }
+    }
+
+    if (minHeight || maxHeight) {
+      filter['dimensions.height'] = {};
+      if (minHeight) {
+        const min = Number(minHeight);
+        if (!isNaN(min) && min > 0) filter['dimensions.height'].$gte = min;
+      }
+      if (maxHeight) {
+        const max = Number(maxHeight);
+        if (!isNaN(max) && max > 0) filter['dimensions.height'].$lte = max;
+      }
+    }
+
     if (minPrice || maxPrice) {
       filter.pricePerDay = {};
       if (minPrice) {
@@ -285,6 +459,7 @@ export const getAllCars = async (req: Request, res: Response) => {
       'year',
       'brand',
       'carModel',
+      'vehicleCategory',
     ];
     const sortField = validSortFields.includes(sortBy as string)
       ? (sortBy as string)
@@ -317,17 +492,23 @@ export const getAllCars = async (req: Request, res: Response) => {
         hasPrev: hasPrevPage,
       },
       filters: {
+        vehicleCategory,
+        vehicleSubCategory,
         brand,
         fuelType,
         transmission,
         minPrice,
         maxPrice,
         seatingCapacity,
+        minLength,
+        maxLength,
+        minHeight,
+        maxHeight,
       },
-      message: `Found ${total} cars`,
+      message: `Found ${total} vehicles`,
     });
   } catch (error: any) {
-    console.error('❌ Get all cars error:', error);
+    console.error('❌ Get all vehicles error:', error);
     return res.status(500).json({
       message: 'Server error',
       error: 'SERVER_ERROR',
@@ -336,7 +517,7 @@ export const getAllCars = async (req: Request, res: Response) => {
 };
 
 //
-// Get car details by ID
+// Get vehicle details by ID
 // Public endpoint
 //
 export const getCarById = async (req: Request, res: Response) => {
@@ -344,7 +525,7 @@ export const getCarById = async (req: Request, res: Response) => {
     const { carId } = req.params;
     if (!carId) {
       return res.status(400).json({
-        message: 'Car ID is required',
+        message: 'Vehicle ID is required',
         error: 'MISSING_CAR_ID',
       });
     }
@@ -356,7 +537,7 @@ export const getCarById = async (req: Request, res: Response) => {
 
     if (!car) {
       return res.status(404).json({
-        message: 'Car not found',
+        message: 'Vehicle not found',
         error: 'CAR_NOT_FOUND',
       });
     }
@@ -364,10 +545,10 @@ export const getCarById = async (req: Request, res: Response) => {
     res.json({
       success: true,
       car,
-      message: 'Car details retrieved successfully',
+      message: 'Vehicle details retrieved successfully',
     });
   } catch (error: any) {
-    console.error('❌ Get car by ID error:', error);
+    console.error('❌ Get vehicle by ID error:', error);
     return res.status(500).json({
       message: 'Server error',
       error: 'SERVER_ERROR',
@@ -376,132 +557,408 @@ export const getCarById = async (req: Request, res: Response) => {
 };
 
 //
-// Update car details (only company owner)
+// Update vehicle details (only company owner)
 //
+//
+// Update vehicle details (only company owner)
+//
+//
+// Update vehicle details (only company owner)
+//
+//
+// Update vehicle details (only company owner)
+//
+//
+// Update vehicle details (only company owner) - Bulletproof version
+//
+// Updated updateCar function with simplified error handling
+// Updated updateCar function that works with your existing auth structure
 export const updateCar = async (req: Request, res: Response) => {
+  const startTime = Date.now();
+  let uploadedFiles: Express.Multer.File[] | undefined;
+
+  // Helper function to clean up uploaded files
+  const cleanupFiles = () => {
+    if (uploadedFiles && Array.isArray(uploadedFiles)) {
+      uploadedFiles.forEach((file) => {
+        try {
+          if (file && file.path && fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+        } catch (err) {
+          console.error('Error cleaning up file:', file?.path, err);
+        }
+      });
+    }
+  };
+
   try {
+    console.log('🚀 Update vehicle request started');
+    
+    // Extract uploaded files
+    uploadedFiles = req.files as Express.Multer.File[];
+    
+    // Basic request validation
     const { carId } = req.params;
-    const requestingUser = (req as any).user;
-    if (!carId) {
+    if (!carId || !carId.match(/^[0-9a-fA-F]{24}$/)) {
+      cleanupFiles();
       return res.status(400).json({
-        message: 'Car ID is required',
-        error: 'MISSING_CAR_ID',
+        message: 'Valid vehicle ID is required',
+        error: 'INVALID_CAR_ID',
       });
     }
 
-    const car = await Car.findById(carId).populate('companyId', 'ownerId');
-    if (!car) {
-      return res.status(404).json({
-        message: 'Car not found',
-        error: 'CAR_NOT_FOUND',
+    // Check if req.body exists (should be populated by multer middleware)
+    if (!req.body || typeof req.body !== 'object') {
+      cleanupFiles();
+      return res.status(400).json({
+        message: 'Request body is missing. Make sure you are sending form-data.',
+        error: 'MISSING_BODY',
+        debug: {
+          contentType: req.headers['content-type'],
+          bodyExists: !!req.body,
+          bodyType: typeof req.body,
+          hasFiles: uploadedFiles ? uploadedFiles.length : 0
+        }
       });
     }
 
-    // Authorization: only company owner can update
-    if (
-      !car.companyId ||
-      (car.companyId as any).ownerId.toString() !==
-        requestingUser._id.toString()
-    ) {
+    console.log('📋 Request body fields:', Object.keys(req.body));
+    console.log('📁 Files received:', uploadedFiles?.length || 0);
+
+    // User authentication check - using your auth structure
+    const requestingUser = (req as any).user;
+    if (!requestingUser) {
+      cleanupFiles();
+      return res.status(401).json({
+        message: 'Authentication required',
+        error: 'NO_USER_CONTEXT',
+      });
+    }
+
+    // Check if user has rental-company role
+    if (requestingUser.role !== 'rental-company') {
+      cleanupFiles();
       return res.status(403).json({
-        message:
-          'Access denied. You can only update cars belonging to your company.',
+        message: 'Access denied. Only rental company owners can update vehicles.',
         error: 'INSUFFICIENT_PERMISSIONS',
       });
     }
 
-    const allowedFields = [
-      'brand',
-      'carModel',
-      'year',
-      'color',
-      'fuelType',
-      'transmission',
-      'seatingCapacity',
-      'engineSize',
-      'mileage',
-      'pricePerDay',
-      'pricePerWeek',
-      'pricePerMonth',
-      'airConditioning',
-      'bluetooth',
-      'gps',
-      'sunroof',
-      'description',
-      'isAvailable',
-    ];
+    console.log('👤 User authenticated:', requestingUser._id, 'Role:', requestingUser.role);
 
+    // Find vehicle and check ownership
+    const car = await Car.findById(carId).populate('companyId', 'ownerId');
+    if (!car) {
+      cleanupFiles();
+      return res.status(404).json({
+        message: 'Vehicle not found',
+        error: 'CAR_NOT_FOUND',
+      });
+    }
+
+    // Authorization check - make sure user owns the company that owns this car
+    const vehicleOwnerId = (car.companyId as any).ownerId?.toString();
+    const requestingUserId = requestingUser._id.toString();
+    
+    if (vehicleOwnerId !== requestingUserId) {
+      cleanupFiles();
+      return res.status(403).json({
+        message: 'Access denied. You can only update vehicles belonging to your company.',
+        error: 'INSUFFICIENT_PERMISSIONS',
+      });
+    }
+
+    console.log('✅ Authorization passed, processing updates...');
+
+    // Track changes
     const updatedFields: string[] = [];
-    allowedFields.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        if (
-          [
-            'year',
-            'seatingCapacity',
-            'pricePerDay',
-            'pricePerWeek',
-            'pricePerMonth',
-          ].includes(field)
-        ) {
-          const numValue = Number(req.body[field]);
-          if (!isNaN(numValue) && numValue > 0) {
-            (car as any)[field] = numValue;
-            updatedFields.push(field);
+    const changes: any = {};
+
+    // Handle basic string fields
+    const stringFields = ['brand', 'carModel', 'color', 'description', 'licensePlate'];
+    stringFields.forEach(field => {
+      if (req.body[field] !== undefined && req.body[field] !== null && req.body[field] !== '') {
+        const newValue = req.body[field].toString().trim();
+        const oldValue = (car as any)[field];
+        
+        if (newValue && newValue !== oldValue) {
+          changes[field] = { old: oldValue, new: newValue };
+          if (field === 'licensePlate') {
+            (car as any)[field] = newValue.toUpperCase();
+          } else {
+            (car as any)[field] = newValue;
           }
-        } else if (
-          [
-            'airConditioning',
-            'bluetooth',
-            'gps',
-            'sunroof',
-            'isAvailable',
-          ].includes(field)
-        ) {
-          (car as any)[field] = Boolean(req.body[field]);
           updatedFields.push(field);
-        } else {
-          (car as any)[field] = req.body[field].toString().trim();
-          updatedFields.push(field);
+          console.log(`✏️ Updated ${field}: ${oldValue} → ${newValue}`);
         }
       }
     });
 
-    if (updatedFields.length === 0) {
-      return res.status(400).json({
-        message: 'No valid fields provided for update',
-        allowedFields,
-        error: 'NO_UPDATE_FIELDS',
+    // Handle numeric fields
+    const numericFields = ['year', 'seatingCapacity', 'pricePerDay', 'pricePerWeek', 'pricePerMonth'];
+    numericFields.forEach(field => {
+      if (req.body[field] !== undefined && req.body[field] !== null && req.body[field] !== '') {
+        const numValue = Number(req.body[field]);
+        const oldValue = (car as any)[field];
+        
+        if (!isNaN(numValue) && numValue > 0 && numValue !== oldValue) {
+          changes[field] = { old: oldValue, new: numValue };
+          (car as any)[field] = numValue;
+          updatedFields.push(field);
+          console.log(`🔢 Updated ${field}: ${oldValue} → ${numValue}`);
+        }
+      }
+    });
+
+    // Handle boolean fields
+    const booleanFields = ['airConditioning', 'bluetooth', 'gps', 'sunroof', 'isAvailable'];
+    booleanFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        const boolValue = req.body[field] === 'true' || req.body[field] === true;
+        const oldValue = (car as any)[field];
+        
+        if (boolValue !== oldValue) {
+          changes[field] = { old: oldValue, new: boolValue };
+          (car as any)[field] = boolValue;
+          updatedFields.push(field);
+          console.log(`☑️ Updated ${field}: ${oldValue} → ${boolValue}`);
+        }
+      }
+    });
+
+    // Handle vehicle category changes
+    if (req.body.vehicleCategory && req.body.vehicleCategory !== car.vehicleCategory) {
+      const newCategory = req.body.vehicleCategory;
+      
+      // Category-specific validation
+      if (newCategory === 'car' || newCategory === 'van') {
+        const requiredSubCategories = newCategory === 'car' 
+          ? ['flex', 'mini', 'regular'] 
+          : ['mini', 'regular'];
+        
+        if (!req.body.vehicleSubCategory || !requiredSubCategories.includes(req.body.vehicleSubCategory)) {
+          cleanupFiles();
+          return res.status(400).json({
+            message: `${newCategory} category requires sub-category (${requiredSubCategories.join(', ')})`,
+            error: 'VALIDATION_ERROR',
+          });
+        }
+      }
+
+      if (newCategory === 'lorry') {
+        // Check dimensions for lorry
+        const hasLength = req.body['dimensions[length]'] || req.body.dimensionsLength;
+        const hasWidth = req.body['dimensions[width]'] || req.body.dimensionsWidth;
+        const hasHeight = req.body['dimensions[height]'] || req.body.dimensionsHeight;
+        
+        if (!hasLength || !hasWidth || !hasHeight) {
+          cleanupFiles();
+          return res.status(400).json({
+            message: 'Lorry category requires dimensions (length, width, height)',
+            error: 'VALIDATION_ERROR',
+          });
+        }
+      }
+
+      changes.vehicleCategory = { old: car.vehicleCategory, new: newCategory };
+      car.vehicleCategory = newCategory;
+      updatedFields.push('vehicleCategory');
+      console.log(`🚗 Updated category: ${car.vehicleCategory} → ${newCategory}`);
+    }
+
+    // Handle vehicle sub-category
+    if (req.body.vehicleSubCategory !== undefined) {
+      const currentCategory = car.vehicleCategory;
+      let validSubCategory = true;
+      
+      if (currentCategory === 'car' && req.body.vehicleSubCategory && 
+          !['flex', 'mini', 'regular'].includes(req.body.vehicleSubCategory)) {
+        validSubCategory = false;
+      }
+      
+      if (currentCategory === 'van' && req.body.vehicleSubCategory && 
+          !['mini', 'regular'].includes(req.body.vehicleSubCategory)) {
+        validSubCategory = false;
+      }
+
+      if (!validSubCategory) {
+        cleanupFiles();
+        return res.status(400).json({
+          message: `Invalid sub-category for ${currentCategory}`,
+          error: 'VALIDATION_ERROR',
+        });
+      }
+
+      if (req.body.vehicleSubCategory !== car.vehicleSubCategory) {
+        changes.vehicleSubCategory = { old: car.vehicleSubCategory, new: req.body.vehicleSubCategory };
+        car.vehicleSubCategory = req.body.vehicleSubCategory || undefined;
+        updatedFields.push('vehicleSubCategory');
+        console.log(`📋 Updated sub-category: ${car.vehicleSubCategory} → ${req.body.vehicleSubCategory}`);
+      }
+    }
+
+    // Handle category-specific fields
+    const currentCategory = car.vehicleCategory;
+    
+    if (currentCategory === 'lorry') {
+      // Handle dimensions for lorry (support both formats)
+      const length = req.body['dimensions[length]'] || req.body.dimensionsLength;
+      const width = req.body['dimensions[width]'] || req.body.dimensionsWidth;
+      const height = req.body['dimensions[height]'] || req.body.dimensionsHeight;
+      
+      if (length || width || height) {
+        const newDimensions = {
+          length: length ? Number(length) : car.dimensions?.length || 0,
+          width: width ? Number(width) : car.dimensions?.width || 0,
+          height: height ? Number(height) : car.dimensions?.height || 0
+        };
+        
+        const dimensionsChanged = !car.dimensions ||
+          car.dimensions.length !== newDimensions.length ||
+          car.dimensions.width !== newDimensions.width ||
+          car.dimensions.height !== newDimensions.height;
+          
+        if (dimensionsChanged) {
+          changes.dimensions = { old: car.dimensions, new: newDimensions };
+          car.dimensions = newDimensions;
+          updatedFields.push('dimensions');
+          console.log('📐 Updated dimensions:', newDimensions);
+        }
+      }
+    } else {
+      // Handle vehicle-specific fields for non-lorry vehicles
+      const vehicleFields = ['fuelType', 'transmission', 'engineSize', 'fuelConsumption'];
+      vehicleFields.forEach(field => {
+        if (req.body[field] !== undefined && req.body[field] !== null && req.body[field] !== '') {
+          const newValue = req.body[field].toString().trim();
+          const oldValue = (car as any)[field];
+          
+          if (newValue && newValue !== oldValue) {
+            changes[field] = { old: oldValue, new: newValue };
+            (car as any)[field] = newValue;
+            updatedFields.push(field);
+            console.log(`⚙️ Updated ${field}: ${oldValue} → ${newValue}`);
+          }
+        }
       });
     }
 
+    // Handle new images
+    if (uploadedFiles && uploadedFiles.length > 0) {
+      const newImageUrls = uploadedFiles.map(
+        (file) => `/uploads/cars/${file.filename}`,
+      );
+      
+      changes.images = { 
+        old: car.images?.length || 0, 
+        new: (car.images?.length || 0) + newImageUrls.length,
+        added: newImageUrls
+      };
+      car.images = [...(car.images || []), ...newImageUrls];
+      updatedFields.push('images');
+      console.log('📸 Added', newImageUrls.length, 'new images:', newImageUrls);
+    }
+
+    // Check for license plate uniqueness if changed
+    if (updatedFields.includes('licensePlate')) {
+      const existingCar = await Car.findOne({
+        licensePlate: car.licensePlate,
+        _id: { $ne: carId }
+      });
+      
+      if (existingCar) {
+        cleanupFiles();
+        return res.status(400).json({
+          message: 'A vehicle with this license plate already exists',
+          error: 'DUPLICATE_LICENSE_PLATE',
+        });
+      }
+    }
+
+    console.log('📝 Total updated fields:', updatedFields.length, updatedFields);
+
+    // Save changes if any updates were made
+    if (updatedFields.length === 0) {
+      cleanupFiles();
+      return res.status(200).json({
+        success: true,
+        message: 'No changes detected',
+        car,
+        updatedFields: [],
+        changes: {}
+      });
+    }
+
+    // Save to database
+    console.log('💾 Saving changes to database...');
     await car.save();
     await car.populate('companyId', 'name locations phone email');
 
+    // Success response
+    const executionTime = Date.now() - startTime;
+    const vehicleTypeDisplay = (car.vehicleCategory === 'car' || car.vehicleCategory === 'van') 
+      ? `${car.vehicleSubCategory || ''} ${car.vehicleCategory}`.trim()
+      : car.vehicleCategory;
+
+    console.log('✅ Vehicle updated successfully in', executionTime + 'ms');
+    console.log('🎉 Updated fields:', updatedFields);
+
     res.json({
       success: true,
-      message: 'Car updated successfully',
+      message: `${vehicleTypeDisplay.charAt(0).toUpperCase() + vehicleTypeDisplay.slice(1)} updated successfully`,
       car,
       updatedFields,
+      changes,
+      executionTime: executionTime + 'ms'
     });
+
   } catch (error: any) {
-    console.error('❌ Update car error:', error);
+    const executionTime = Date.now() - startTime;
+    console.error('❌ Update vehicle error:', error.message);
+    console.error('❌ Error stack:', error.stack);
+    
+    cleanupFiles();
+    
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(
+        (err: any) => err.message,
+      );
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: validationErrors,
+        error: 'VALIDATION_ERROR',
+        executionTime: executionTime + 'ms'
+      });
+    }
+    
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        message: 'Invalid data format',
+        error: 'CAST_ERROR',
+        details: error.message,
+        executionTime: executionTime + 'ms'
+      });
+    }
+    
     return res.status(500).json({
-      message: 'Server error',
+      message: 'Internal server error',
       error: 'SERVER_ERROR',
+      executionTime: executionTime + 'ms'
     });
   }
 };
-
 //
-// Delete car (only company owner)
+// Delete vehicle (only company owner)
 //
 export const deleteCar = async (req: Request, res: Response) => {
   try {
     const { carId } = req.params;
     const requestingUser = (req as any).user;
+
     if (!carId) {
       return res.status(400).json({
-        message: 'Car ID is required',
+        message: 'Vehicle ID is required',
         error: 'MISSING_CAR_ID',
       });
     }
@@ -509,7 +966,7 @@ export const deleteCar = async (req: Request, res: Response) => {
     const car = await Car.findById(carId).populate('companyId', 'ownerId');
     if (!car) {
       return res.status(404).json({
-        message: 'Car not found',
+        message: 'Vehicle not found',
         error: 'CAR_NOT_FOUND',
       });
     }
@@ -522,25 +979,33 @@ export const deleteCar = async (req: Request, res: Response) => {
     ) {
       return res.status(403).json({
         message:
-          'Access denied. You can only delete cars belonging to your company.',
+          'Access denied. You can only delete vehicles belonging to your company.',
         error: 'INSUFFICIENT_PERMISSIONS',
       });
     }
 
     await Car.findByIdAndDelete(carId);
 
+    const vehicleTypeDisplay =
+      car.vehicleCategory === 'car' || car.vehicleCategory === 'van'
+        ? `${car.vehicleSubCategory} ${car.vehicleCategory}`
+        : car.vehicleCategory;
+
     res.json({
       success: true,
-      message: 'Car deleted successfully',
+      message: 'Vehicle deleted successfully',
       deletedCar: {
         id: carId,
+        vehicleCategory: car.vehicleCategory,
+        vehicleSubCategory: car.vehicleSubCategory,
+        vehicleType: vehicleTypeDisplay,
         brand: car.brand,
         carModel: car.carModel,
         licensePlate: car.licensePlate,
       },
     });
   } catch (error: any) {
-    console.error('❌ Delete car error:', error);
+    console.error('❌ Delete vehicle error:', error);
     return res.status(500).json({
       message: 'Server error',
       error: 'SERVER_ERROR',
@@ -549,15 +1014,16 @@ export const deleteCar = async (req: Request, res: Response) => {
 };
 
 //
-// Toggle car availability (only company owner)
+// Toggle vehicle availability (only company owner)
 //
 export const toggleCarAvailability = async (req: Request, res: Response) => {
   try {
     const { carId } = req.params;
     const requestingUser = (req as any).user;
+
     if (!carId) {
       return res.status(400).json({
-        message: 'Car ID is required',
+        message: 'Vehicle ID is required',
         error: 'MISSING_CAR_ID',
       });
     }
@@ -565,7 +1031,7 @@ export const toggleCarAvailability = async (req: Request, res: Response) => {
     const car = await Car.findById(carId).populate('companyId', 'ownerId');
     if (!car) {
       return res.status(404).json({
-        message: 'Car not found',
+        message: 'Vehicle not found',
         error: 'CAR_NOT_FOUND',
       });
     }
@@ -578,7 +1044,7 @@ export const toggleCarAvailability = async (req: Request, res: Response) => {
     ) {
       return res.status(403).json({
         message:
-          'Access denied. You can only update cars belonging to your company.',
+          'Access denied. You can only update vehicles belonging to your company.',
         error: 'INSUFFICIENT_PERMISSIONS',
       });
     }
@@ -591,13 +1057,13 @@ export const toggleCarAvailability = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: `Car is now ${car.isAvailable ? 'available' : 'unavailable'}`,
+      message: `Vehicle is now ${car.isAvailable ? 'available' : 'unavailable'}`,
       car,
       previousStatus,
       currentStatus: car.isAvailable,
     });
   } catch (error: any) {
-    console.error('❌ Toggle car availability error:', error);
+    console.error('❌ Toggle vehicle availability error:', error);
     return res.status(500).json({
       message: 'Server error',
       error: 'SERVER_ERROR',

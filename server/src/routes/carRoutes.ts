@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   addCar,
-  getCompanyCars,        // <-- Updated name
+  getCompanyCars,
   getAllCars,
   getCarById,
   updateCar,
@@ -29,13 +29,20 @@ router.get('/:carId', getCarById);
 
 // Company-centric routes
 router.get(
-  '/company/:companyId',           // <-- Changed from /company/:CompanyId
+  '/company/:companyId',
   authMiddleware,
-  getCompanyCars                   // <-- Updated controller
+  getCompanyCars
 );
 
 // Modification routes
-router.put('/:carId', authMiddleware, updateCar);
+// UPDATE: Added uploadCarImages middleware for update route to handle multipart form data
+router.put(
+  '/:carId', 
+  authMiddleware, 
+  uploadCarImages,  // <-- Added this line to handle multipart form data
+  updateCar
+);
+
 router.delete('/:carId', authMiddleware, deleteCar);
 router.patch('/:carId/toggle-availability', authMiddleware, toggleCarAvailability);
 
