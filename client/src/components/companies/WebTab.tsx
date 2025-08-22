@@ -404,10 +404,10 @@ export default function WebTab() {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="text-gray-600">Loading your vehicles...</p>
+        {/* <p className="text-gray-600">Loading your vehicles...</p>
         <p className="text-gray-400 text-sm">User ID: {user?.userId}</p>
         <p className="text-gray-400 text-xs">Username: {user?.username}</p>
-        <p className="text-gray-400 text-xs">Role: {user?.role}</p>
+        <p className="text-gray-400 text-xs">Role: {user?.role}</p> */}
         <button
           onClick={() => {
             console.log("🔄 Forcing loading stop");

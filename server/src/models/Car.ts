@@ -28,10 +28,24 @@ export interface ICar extends Document {
     height: number;  // in feet
   };
   
-  // Pricing
-  pricePerDay: number;
-  pricePerWeek?: number;
-  pricePerMonth?: number;
+  // Updated Pricing Structure - Starting prices with driver options
+  pricing: {
+    daily: {
+      withoutDriver: number;    // Starting price per day without driver
+      withDriver?: number;      // Starting price per day with driver (optional)
+    };
+    weekly?: {
+      withoutDriver: number;    // Starting price per week without driver
+      withDriver?: number;      // Starting price per week with driver (optional)
+    };
+    monthly?: {
+      withoutDriver: number;    // Starting price per month without driver
+      withDriver?: number;      // Starting price per month with driver (optional)
+    };
+  };
+  
+  // Driver availability
+  driverAvailable: boolean;     // Whether company provides driver service
   
   // Features
   airConditioning?: boolean;
@@ -161,10 +175,74 @@ const carSchema = new mongoose.Schema<ICar>({
     }
   },
 
-  // Pricing
-  pricePerDay: { type: Number, required: true, min: 0 },
-  pricePerWeek: { type: Number, min: 0 },
-  pricePerMonth: { type: Number, min: 0 },
+  // Updated Pricing Structure
+  pricing: {
+    daily: {
+      withoutDriver: { 
+        type: Number, 
+        required: true, 
+        min: 0 
+      },
+      withDriver: { 
+        type: Number, 
+        min: 0,
+        validate: {
+          validator: function(this: ICar, value: number) {
+            // If withDriver price is provided, driver must be available
+            if (value !== undefined && value !== null && !this.driverAvailable) {
+              return false;
+            }
+            return true;
+          },
+          message: 'Cannot set driver price when driver service is not available'
+        }
+      }
+    },
+    weekly: {
+      withoutDriver: { 
+        type: Number, 
+        min: 0 
+      },
+      withDriver: { 
+        type: Number, 
+        min: 0,
+        validate: {
+          validator: function(this: ICar, value: number) {
+            if (value !== undefined && value !== null && !this.driverAvailable) {
+              return false;
+            }
+            return true;
+          },
+          message: 'Cannot set driver price when driver service is not available'
+        }
+      }
+    },
+    monthly: {
+      withoutDriver: { 
+        type: Number, 
+        min: 0 
+      },
+      withDriver: { 
+        type: Number, 
+        min: 0,
+        validate: {
+          validator: function(this: ICar, value: number) {
+            if (value !== undefined && value !== null && !this.driverAvailable) {
+              return false;
+            }
+            return true;
+          },
+          message: 'Cannot set driver price when driver service is not available'
+        }
+      }
+    }
+  },
+
+  // Driver availability
+  driverAvailable: { 
+    type: Boolean, 
+    default: false 
+  },
 
   // Features
   airConditioning: { type: Boolean, default: false },
@@ -177,10 +255,31 @@ const carSchema = new mongoose.Schema<ICar>({
   isAvailable: { type: Boolean, default: true },
   description: { type: String, maxlength: 500 },
   licensePlate: { type: String, required: true, unique: true },
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  // Add a virtual for backward compatibility
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
 
+// Virtual fields for backward compatibility
+carSchema.virtual('pricePerDay').get(function() {
+  return this.pricing?.daily?.withoutDriver || 0;
+});
+
+carSchema.virtual('pricePerWeek').get(function() {
+  return this.pricing?.weekly?.withoutDriver;
+});
+
+carSchema.virtual('pricePerMonth').get(function() {
+  return this.pricing?.monthly?.withoutDriver;
+});
+
+// Indexes
 carSchema.index({ companyId: 1, isAvailable: 1 });
 carSchema.index({ vehicleCategory: 1, vehicleSubCategory: 1 });
 carSchema.index({ brand: 1, carModel: 1 });
+carSchema.index({ 'pricing.daily.withoutDriver': 1 });
+carSchema.index({ driverAvailable: 1 });
 
 export const Car = mongoose.model<ICar>('Car', carSchema);

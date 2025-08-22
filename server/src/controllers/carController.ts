@@ -4,7 +4,7 @@ import { RentalCompany } from '../models/RentalCompany';
 import fs from 'fs';
 
 //
-// Add new vehicle with images
+// Add new vehicle with flexible pricing structure
 // Only rental-company users with rental company can add vehicles
 //
 export const addCar = async (req: Request, res: Response) => {
@@ -36,8 +36,7 @@ export const addCar = async (req: Request, res: Response) => {
         });
       }
       return res.status(400).json({
-        message:
-          'No rental company profile found. Please create your company profile first.',
+        message: 'No rental company profile found. Please create your company profile first.',
         error: 'NO_COMPANY_PROFILE',
       });
     }
@@ -64,9 +63,14 @@ export const addCar = async (req: Request, res: Response) => {
       engineSize,
       fuelConsumption,
       dimensions,
-      pricePerDay,
-      pricePerWeek,
-      pricePerMonth,
+      // Updated pricing fields
+      dailyWithoutDriver,
+      dailyWithDriver,
+      weeklyWithoutDriver,
+      weeklyWithDriver,
+      monthlyWithoutDriver,
+      monthlyWithDriver,
+      driverAvailable,
       airConditioning,
       bluetooth,
       gps,
@@ -82,7 +86,7 @@ export const addCar = async (req: Request, res: Response) => {
       !carModel ||
       !year ||
       !color ||
-      !pricePerDay ||
+      !dailyWithoutDriver ||
       !licensePlate
     ) {
       uploadedFiles.forEach((file) => {
@@ -96,7 +100,7 @@ export const addCar = async (req: Request, res: Response) => {
           'carModel',
           'year',
           'color',
-          'pricePerDay',
+          'dailyWithoutDriver',
           'licensePlate',
         ],
         error: 'VALIDATION_ERROR',
@@ -113,8 +117,7 @@ export const addCar = async (req: Request, res: Response) => {
           if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
         });
         return res.status(400).json({
-          message:
-            'Car category requires sub-category (flex, mini, or regular)',
+          message: 'Car category requires sub-category (flex, mini, or regular)',
           required: ['vehicleSubCategory'],
           error: 'VALIDATION_ERROR',
         });
@@ -133,6 +136,30 @@ export const addCar = async (req: Request, res: Response) => {
           error: 'VALIDATION_ERROR',
         });
       }
+    }
+
+    // Pricing validation
+    const dailyWithoutDriverNum = Number(dailyWithoutDriver);
+    if (isNaN(dailyWithoutDriverNum) || dailyWithoutDriverNum <= 0) {
+      uploadedFiles.forEach((file) => {
+        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      });
+      return res.status(400).json({
+        message: 'Valid daily price without driver is required',
+        error: 'VALIDATION_ERROR',
+      });
+    }
+
+    // Driver pricing validation
+    const isDriverAvailable = driverAvailable === 'true' || driverAvailable === true;
+    if (dailyWithDriver && !isDriverAvailable) {
+      uploadedFiles.forEach((file) => {
+        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      });
+      return res.status(400).json({
+        message: 'Cannot set driver pricing when driver service is not available',
+        error: 'VALIDATION_ERROR',
+      });
     }
 
     // Vehicle type specific validation
@@ -203,6 +230,30 @@ export const addCar = async (req: Request, res: Response) => {
       (file) => `/uploads/cars/${file.filename}`,
     );
 
+    // Build pricing object
+    const pricingData: any = {
+      daily: {
+        withoutDriver: dailyWithoutDriverNum,
+        withDriver: dailyWithDriver ? Number(dailyWithDriver) : undefined
+      }
+    };
+
+    // Add weekly pricing if provided
+    if (weeklyWithoutDriver) {
+      pricingData.weekly = {
+        withoutDriver: Number(weeklyWithoutDriver),
+        withDriver: weeklyWithDriver ? Number(weeklyWithDriver) : undefined
+      };
+    }
+
+    // Add monthly pricing if provided
+    if (monthlyWithoutDriver) {
+      pricingData.monthly = {
+        withoutDriver: Number(monthlyWithoutDriver),
+        withDriver: monthlyWithDriver ? Number(monthlyWithDriver) : undefined
+      };
+    }
+
     // Create vehicle data
     const vehicleData: any = {
       companyId: company._id,
@@ -211,9 +262,8 @@ export const addCar = async (req: Request, res: Response) => {
       carModel: carModel.trim(),
       year: Number(year),
       color: color.trim(),
-      pricePerDay: Number(pricePerDay),
-      pricePerWeek: pricePerWeek ? Number(pricePerWeek) : undefined,
-      pricePerMonth: pricePerMonth ? Number(pricePerMonth) : undefined,
+      pricing: pricingData,
+      driverAvailable: isDriverAvailable,
       description: description ? description.trim() : undefined,
       licensePlate: licensePlate.toUpperCase().trim(),
       images: imageUrls,
@@ -262,6 +312,15 @@ export const addCar = async (req: Request, res: Response) => {
       success: true,
       message: `${vehicleTypeDisplay.charAt(0).toUpperCase() + vehicleTypeDisplay.slice(1)} added successfully with ${imageUrls.length} images`,
       car,
+      pricingInfo: {
+        dailyWithoutDriver: pricingData.daily.withoutDriver,
+        dailyWithDriver: pricingData.daily.withDriver,
+        weeklyWithoutDriver: pricingData.weekly?.withoutDriver,
+        weeklyWithDriver: pricingData.weekly?.withDriver,
+        monthlyWithoutDriver: pricingData.monthly?.withoutDriver,
+        monthlyWithDriver: pricingData.monthly?.withDriver,
+        driverAvailable: isDriverAvailable
+      }
     });
   } catch (error: any) {
     console.error('❌ Add vehicle error:', error);
@@ -291,49 +350,7 @@ export const addCar = async (req: Request, res: Response) => {
 };
 
 //
-// Get all vehicles for a rental company
-// GET /api/cars/company/:companyId
-//
-export const getCompanyCars = async (req: Request, res: Response) => {
-  const { companyId } = req.params;
-
-  try {
-    // Check if company exists
-    const company = await RentalCompany.findById(companyId);
-    if (!company) {
-      return res.status(404).json({
-        success: false,
-        message: 'Rental company not found',
-      });
-    }
-
-    // Find vehicles for this company
-    const cars = await Car.find({ companyId }).populate(
-      'companyId',
-      'name locations phone email',
-    );
-
-    // Return success with vehicles (even if empty array)
-    return res.status(200).json({
-      success: true,
-      cars: cars,
-      total: cars.length,
-      message:
-        cars.length === 0
-          ? 'No vehicles found'
-          : `Found ${cars.length} vehicles`,
-    });
-  } catch (error) {
-    console.error('Error getting company vehicles:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error',
-    });
-  }
-};
-
-//
-// Get all available vehicles with filtering and pagination
+// Get all available vehicles with updated filtering for driver options
 // Public endpoint
 //
 export const getAllCars = async (req: Request, res: Response) => {
@@ -346,6 +363,7 @@ export const getAllCars = async (req: Request, res: Response) => {
       transmission,
       minPrice,
       maxPrice,
+      withDriver, // New filter: 'true', 'false', or undefined (both)
       seatingCapacity,
       minLength,
       maxLength,
@@ -389,6 +407,14 @@ export const getAllCars = async (req: Request, res: Response) => {
     }
 
     if (brand) filter.brand = new RegExp(brand as string, 'i');
+
+    // Driver availability filter
+    if (withDriver === 'true') {
+      filter.driverAvailable = true;
+    } else if (withDriver === 'false') {
+      filter.driverAvailable = false;
+    }
+    // If withDriver is undefined, show all vehicles regardless of driver availability
 
     // Only filter by fuel type for non-lorry vehicles
     if (
@@ -437,15 +463,16 @@ export const getAllCars = async (req: Request, res: Response) => {
       }
     }
 
+    // Price filtering - now based on daily withoutDriver price by default
     if (minPrice || maxPrice) {
-      filter.pricePerDay = {};
+      filter['pricing.daily.withoutDriver'] = {};
       if (minPrice) {
         const min = Number(minPrice);
-        if (!isNaN(min) && min >= 0) filter.pricePerDay.$gte = min;
+        if (!isNaN(min) && min >= 0) filter['pricing.daily.withoutDriver'].$gte = min;
       }
       if (maxPrice) {
         const max = Number(maxPrice);
-        if (!isNaN(max) && max > 0) filter.pricePerDay.$lte = max;
+        if (!isNaN(max) && max > 0) filter['pricing.daily.withoutDriver'].$lte = max;
       }
     }
 
@@ -455,7 +482,7 @@ export const getAllCars = async (req: Request, res: Response) => {
 
     const validSortFields = [
       'createdAt',
-      'pricePerDay',
+      'pricing.daily.withoutDriver',
       'year',
       'brand',
       'carModel',
@@ -499,6 +526,7 @@ export const getAllCars = async (req: Request, res: Response) => {
         transmission,
         minPrice,
         maxPrice,
+        withDriver,
         seatingCapacity,
         minLength,
         maxLength,
@@ -557,22 +585,8 @@ export const getCarById = async (req: Request, res: Response) => {
 };
 
 //
-// Update vehicle details (only company owner)
+// Updated updateCar function with new pricing structure
 //
-//
-// Update vehicle details (only company owner)
-//
-//
-// Update vehicle details (only company owner)
-//
-//
-// Update vehicle details (only company owner)
-//
-//
-// Update vehicle details (only company owner) - Bulletproof version
-//
-// Updated updateCar function with simplified error handling
-// Updated updateCar function that works with your existing auth structure
 export const updateCar = async (req: Request, res: Response) => {
   const startTime = Date.now();
   let uploadedFiles: Express.Multer.File[] | undefined;
@@ -608,7 +622,7 @@ export const updateCar = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if req.body exists (should be populated by multer middleware)
+    // Check if req.body exists
     if (!req.body || typeof req.body !== 'object') {
       cleanupFiles();
       return res.status(400).json({
@@ -626,7 +640,7 @@ export const updateCar = async (req: Request, res: Response) => {
     console.log('📋 Request body fields:', Object.keys(req.body));
     console.log('📁 Files received:', uploadedFiles?.length || 0);
 
-    // User authentication check - using your auth structure
+    // User authentication check
     const requestingUser = (req as any).user;
     if (!requestingUser) {
       cleanupFiles();
@@ -657,7 +671,7 @@ export const updateCar = async (req: Request, res: Response) => {
       });
     }
 
-    // Authorization check - make sure user owns the company that owns this car
+    // Authorization check
     const vehicleOwnerId = (car.companyId as any).ownerId?.toString();
     const requestingUserId = requestingUser._id.toString();
     
@@ -696,7 +710,7 @@ export const updateCar = async (req: Request, res: Response) => {
     });
 
     // Handle numeric fields
-    const numericFields = ['year', 'seatingCapacity', 'pricePerDay', 'pricePerWeek', 'pricePerMonth'];
+    const numericFields = ['year', 'seatingCapacity'];
     numericFields.forEach(field => {
       if (req.body[field] !== undefined && req.body[field] !== null && req.body[field] !== '') {
         const numValue = Number(req.body[field]);
@@ -712,7 +726,7 @@ export const updateCar = async (req: Request, res: Response) => {
     });
 
     // Handle boolean fields
-    const booleanFields = ['airConditioning', 'bluetooth', 'gps', 'sunroof', 'isAvailable'];
+    const booleanFields = ['airConditioning', 'bluetooth', 'gps', 'sunroof', 'isAvailable', 'driverAvailable'];
     booleanFields.forEach(field => {
       if (req.body[field] !== undefined) {
         const boolValue = req.body[field] === 'true' || req.body[field] === true;
@@ -726,6 +740,58 @@ export const updateCar = async (req: Request, res: Response) => {
         }
       }
     });
+
+    // Handle pricing updates
+    let pricingUpdated = false;
+    const pricingFields = [
+      'dailyWithoutDriver', 'dailyWithDriver',
+      'weeklyWithoutDriver', 'weeklyWithDriver', 
+      'monthlyWithoutDriver', 'monthlyWithDriver'
+    ];
+
+    pricingFields.forEach(field => {
+      if (req.body[field] !== undefined && req.body[field] !== null && req.body[field] !== '') {
+        const numValue = Number(req.body[field]);
+        if (!isNaN(numValue) && numValue >= 0) {
+          const [period, driverType] = field.replace(/([A-Z])/g, ' $1').toLowerCase().split(' ');
+          const driverKey = driverType === 'with' ? 'withDriver' : 'withoutDriver';
+          
+          if (!car.pricing) car.pricing = { daily: { withoutDriver: 0 } };
+          if (!car.pricing[period as keyof typeof car.pricing]) {
+            (car.pricing as any)[period] = {};
+          }
+          
+          const oldValue = (car.pricing as any)[period][driverKey];
+          if (numValue !== oldValue) {
+            if (!changes.pricing) changes.pricing = {};
+            if (!changes.pricing[period]) changes.pricing[period] = {};
+            changes.pricing[period][driverKey] = { old: oldValue, new: numValue };
+            
+            (car.pricing as any)[period][driverKey] = numValue;
+            pricingUpdated = true;
+            console.log(`💰 Updated ${period} ${driverKey}: ${oldValue} → ${numValue}`);
+          }
+        }
+      }
+    });
+
+    if (pricingUpdated) {
+      updatedFields.push('pricing');
+    }
+
+    // Validate driver pricing consistency
+    if (car.driverAvailable === false) {
+      // Remove driver pricing if driver is not available
+      if (car.pricing?.daily?.withDriver) {
+        car.pricing.daily.withDriver = undefined;
+      }
+      if (car.pricing?.weekly?.withDriver) {
+        car.pricing.weekly.withDriver = undefined;
+      }
+      if (car.pricing?.monthly?.withDriver) {
+        car.pricing.monthly.withDriver = undefined;
+      }
+    }
 
     // Handle vehicle category changes
     if (req.body.vehicleCategory && req.body.vehicleCategory !== car.vehicleCategory) {
@@ -910,7 +976,16 @@ export const updateCar = async (req: Request, res: Response) => {
       car,
       updatedFields,
       changes,
-      executionTime: executionTime + 'ms'
+      executionTime: executionTime + 'ms',
+      pricingInfo: {
+        dailyWithoutDriver: car.pricing?.daily?.withoutDriver,
+        dailyWithDriver: car.pricing?.daily?.withDriver,
+        weeklyWithoutDriver: car.pricing?.weekly?.withoutDriver,
+        weeklyWithDriver: car.pricing?.weekly?.withDriver,
+        monthlyWithoutDriver: car.pricing?.monthly?.withoutDriver,
+        monthlyWithDriver: car.pricing?.monthly?.withDriver,
+        driverAvailable: car.driverAvailable
+      }
     });
 
   } catch (error: any) {
@@ -948,9 +1023,46 @@ export const updateCar = async (req: Request, res: Response) => {
     });
   }
 };
-//
-// Delete vehicle (only company owner)
-//
+
+// Keep the existing functions for company cars, delete, and toggle availability
+export const getCompanyCars = async (req: Request, res: Response) => {
+  const { companyId } = req.params;
+
+  try {
+    // Check if company exists
+    const company = await RentalCompany.findById(companyId);
+    if (!company) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rental company not found',
+      });
+    }
+
+    // Find vehicles for this company
+    const cars = await Car.find({ companyId }).populate(
+      'companyId',
+      'name locations phone email',
+    );
+
+    // Return success with vehicles (even if empty array)
+    return res.status(200).json({
+      success: true,
+      cars: cars,
+      total: cars.length,
+      message:
+        cars.length === 0
+          ? 'No vehicles found'
+          : `Found ${cars.length} vehicles`,
+    });
+  } catch (error) {
+    console.error('Error getting company vehicles:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
+
 export const deleteCar = async (req: Request, res: Response) => {
   try {
     const { carId } = req.params;
@@ -1013,9 +1125,6 @@ export const deleteCar = async (req: Request, res: Response) => {
   }
 };
 
-//
-// Toggle vehicle availability (only company owner)
-//
 export const toggleCarAvailability = async (req: Request, res: Response) => {
   try {
     const { carId } = req.params;
