@@ -186,7 +186,7 @@ export default function AddCarModal({
         weekly: { withoutDriver: "", withDriver: "" },
         monthly: { withoutDriver: "", withDriver: "" },
       },
-      airConditioning: true,
+      airConditioning: false,
       bluetooth: false,
       gps: false,
       sunroof: false,
@@ -552,7 +552,7 @@ export default function AddCarModal({
       // Images (new)
       images.forEach((img) => submitData.append("images", img));
       // Existing images to retain (optional; depends on your backend contract)
-      // submitData.append('existingImages', JSON.stringify(existingImages))
+      submitData.append('existingImages', JSON.stringify(existingImages))
 
       let response: Response;
       if (mode === "edit" && editCar) {

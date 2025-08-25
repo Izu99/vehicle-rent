@@ -254,7 +254,7 @@ const carSchema = new mongoose.Schema<ICar>({
   images: [{ type: String }],
   isAvailable: { type: Boolean, default: true },
   description: { type: String, maxlength: 500 },
-  licensePlate: { type: String, required: true, unique: true },
+  licensePlate: { type: String, required: true },
 }, { 
   timestamps: true,
   // Add a virtual for backward compatibility

@@ -211,19 +211,7 @@ export const addCar = async (req: Request, res: Response) => {
       }
     }
 
-    // License plate uniqueness
-    const existingCar = await Car.findOne({
-      licensePlate: licensePlate.toUpperCase(),
-    });
-    if (existingCar) {
-      uploadedFiles.forEach((file) => {
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-      });
-      return res.status(400).json({
-        message: 'A vehicle with this license plate already exists',
-        error: 'DUPLICATE_LICENSE_PLATE',
-      });
-    }
+    
 
     // Images
     const imageUrls = uploadedFiles.map(
@@ -268,10 +256,10 @@ export const addCar = async (req: Request, res: Response) => {
       licensePlate: licensePlate.toUpperCase().trim(),
       images: imageUrls,
       isAvailable: true,
-      airConditioning: Boolean(airConditioning),
-      bluetooth: Boolean(bluetooth),
-      gps: Boolean(gps),
-      sunroof: Boolean(sunroof),
+      airConditioning: airConditioning === 'true',
+      bluetooth: bluetooth === 'true',
+      gps: gps === 'true',
+      sunroof: sunroof === 'true',
     };
 
     // Add sub-category for car and van
@@ -910,37 +898,36 @@ export const updateCar = async (req: Request, res: Response) => {
       });
     }
 
-    // Handle new images
-    if (uploadedFiles && uploadedFiles.length > 0) {
-      const newImageUrls = uploadedFiles.map(
-        (file) => `/uploads/cars/${file.filename}`,
-      );
-      
-      changes.images = { 
-        old: car.images?.length || 0, 
-        new: (car.images?.length || 0) + newImageUrls.length,
-        added: newImageUrls
-      };
-      car.images = [...(car.images || []), ...newImageUrls];
-      updatedFields.push('images');
-      console.log('📸 Added', newImageUrls.length, 'new images:', newImageUrls);
-    }
-
-    // Check for license plate uniqueness if changed
-    if (updatedFields.includes('licensePlate')) {
-      const existingCar = await Car.findOne({
-        licensePlate: car.licensePlate,
-        _id: { $ne: carId }
-      });
-      
-      if (existingCar) {
-        cleanupFiles();
-        return res.status(400).json({
-          message: 'A vehicle with this license plate already exists',
-          error: 'DUPLICATE_LICENSE_PLATE',
-        });
+    // Handle image updates
+    const newImageUrls = (uploadedFiles || []).map(
+      (file) => `/uploads/cars/${file.filename}`
+    );
+    
+    let existingImages: string[] = [];
+    if (req.body.existingImages) {
+      try {
+        existingImages = JSON.parse(req.body.existingImages);
+      } catch (e) {
+        console.error('Error parsing existingImages JSON:', e);
+        // Decide if you want to fail or proceed without old images
       }
     }
+
+    const finalImages = [...existingImages, ...newImageUrls];
+
+    // Check if the image array has actually changed
+    if (
+      !car.images ||
+      car.images.length !== finalImages.length ||
+      car.images.some((img, i) => img !== finalImages[i])
+    ) {
+      changes.images = { old: car.images, new: finalImages };
+      car.images = finalImages;
+      updatedFields.push('images');
+      console.log('📸 Updated images. Total:', finalImages.length);
+    }
+
+    
 
     console.log('📝 Total updated fields:', updatedFields.length, updatedFields);
 
