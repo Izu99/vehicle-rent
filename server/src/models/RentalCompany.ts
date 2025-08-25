@@ -33,11 +33,7 @@ const rentalCompanySchema = new mongoose.Schema<IRentalCompany>({
     ref: 'User',
     required: true
   },
-  category: {
-    type: String,
-    enum: ['Economy', 'Luxury', 'Business', 'Family/Van', 'Electric/Hybrid', 'Sports/Luxury'],
-    default: 'Economy'
-  },
+ 
   description: {
     type: String,
     maxlength: 500
@@ -55,7 +51,6 @@ const rentalCompanySchema = new mongoose.Schema<IRentalCompany>({
     default: 0
   },
   fleetSize: String,
-  established: String,
   locations: [String],
   features: [String],
   phone: String,

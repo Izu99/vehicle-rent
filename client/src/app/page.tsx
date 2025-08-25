@@ -27,7 +27,8 @@ import {
   CheckCircle,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
+
 
 export default function HomePage() {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -53,8 +54,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen gradient-background text-gray-900">
-      {/* Navbar */}
-      <Navbar onLoginClick={() => setLoginOpen(true)} />
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden h-screen">
@@ -441,8 +441,7 @@ export default function HomePage() {
         </div>
       </motion.section>
 
-      {/* Footer */}
-      <Footer />
+      
 
       {/* Modals */}
       <Dialog open={loginOpen} onOpenChange={setLoginOpen}>

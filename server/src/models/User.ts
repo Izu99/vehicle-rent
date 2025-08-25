@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema<IUser>({
   lastName: { type: String },
   drivingLicenseNumber: { type: String },
   dateOfBirth: { type: Date },
-  address: { type: String },
+  y: { type: String },
   
   // Removed rental-company fields - they're now in RentalCompany model
 }, { timestamps: true });

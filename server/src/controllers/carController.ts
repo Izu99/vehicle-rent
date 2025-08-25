@@ -1038,16 +1038,14 @@ export const getCompanyCars = async (req: Request, res: Response) => {
       });
     }
 
-    // Find vehicles for this company
-    const cars = await Car.find({ companyId }).populate(
-      'companyId',
-      'name locations phone email',
-    );
+    // Find vehicles for this company, always latest first
+    const cars = await Car.find({ companyId })
+      .sort({ createdAt: -1 }) // 🔥 newest cars first
+      .populate('companyId', 'name locations phone email');
 
-    // Return success with vehicles (even if empty array)
     return res.status(200).json({
       success: true,
-      cars: cars,
+      cars,
       total: cars.length,
       message:
         cars.length === 0
@@ -1062,6 +1060,7 @@ export const getCompanyCars = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 export const deleteCar = async (req: Request, res: Response) => {
   try {

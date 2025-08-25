@@ -54,7 +54,7 @@ export default function Navbar() {
           icon: Crown,
           label: 'Admin',
           color: 'bg-purple-100 text-purple-800',
-          dashboardRoute: '/admin'
+          dashboardRoute: '/adminpage'
         }
       case 'rental-company':
         return {

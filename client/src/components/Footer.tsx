@@ -136,7 +136,7 @@ export default function Footer() {
             </div>
 
             {/* Newsletter Signup */}
-            <div className="mb-6">
+            {/* <div className="mb-6">
               <h4 className="font-bold text-primary mb-3 text-base">Stay Updated</h4>
               <p className="text-gray-300 text-sm mb-3">
                 Get exclusive deals and travel tips.
@@ -165,7 +165,7 @@ export default function Footer() {
                   </label>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 

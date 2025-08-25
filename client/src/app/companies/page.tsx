@@ -69,7 +69,8 @@ export default function CompaniesPage() {
         const apiFilters: any = {};
         if (filters.category) apiFilters.category = filters.category;
         if (filters.location) apiFilters.location = filters.location;
-        if (filters.rating) apiFilters.minRating = filters.rating.replace('+', '');
+        if (filters.rating)
+          apiFilters.minRating = filters.rating.replace("+", "");
         if (filters.search) apiFilters.search = filters.search;
 
         const response = await companiesApi.getAll(apiFilters);
@@ -406,7 +407,9 @@ export default function CompaniesPage() {
                       </div>
 
                       <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                        Professional car rental service offering {company.category.toLowerCase()} vehicles with excellent customer service.
+                        Professional car rental service offering{" "}
+                        {company?.category?.toLowerCase() || "various"} vehicles
+                        with excellent customer service.
                       </p>
 
                       {/* Company Info */}

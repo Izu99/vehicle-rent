@@ -47,6 +47,7 @@ interface Car {
   licensePlate: string;
   createdAt: string;
   updatedAt: string;
+  vehicleCategory: "car" | "van" | "lorry" | "bus";
 }
 
 interface CarDataForAddModal {
@@ -70,6 +71,7 @@ interface CarDataForAddModal {
   description?: string;
   licensePlate: string;
   images: string[];
+  vehicleCategory: "car" | "van" | "lorry" | "bus";
 }
 
 // ✅ Pagination Component (Inline)
@@ -209,6 +211,7 @@ export default function WebTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [vehicleCategory, setVehicleCategory] = useState("");
 
   // ✅ Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -234,7 +237,7 @@ export default function WebTab() {
   // ✅ Reset pagination when search changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [search]);
+  }, [search, vehicleCategory]);
 
   const loadCars = async () => {
     if (!user?.userId) {
@@ -295,15 +298,19 @@ export default function WebTab() {
     }
   };
 
-  // ✅ Filter cars based on search
+  // ✅ Filter cars based on search and category
   const filteredCars = useMemo(() => {
-    return cars.filter(
-      (car) =>
+    return cars.filter((car) => {
+      const searchMatch =
         car.brand.toLowerCase().includes(search.toLowerCase()) ||
         car.carModel.toLowerCase().includes(search.toLowerCase()) ||
-        car.licensePlate.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [cars, search]);
+        car.licensePlate.toLowerCase().includes(search.toLowerCase());
+      const categoryMatch = vehicleCategory
+        ? car.vehicleCategory === vehicleCategory
+        : true;
+      return searchMatch && categoryMatch;
+    });
+  }, [cars, search, vehicleCategory]);
 
   // ✅ Get paginated cars
   const paginatedCars = useMemo(() => {
@@ -471,10 +478,22 @@ export default function WebTab() {
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
-          <button className="flex items-center space-x-2 px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
-            <Filter className="w-4 h-4" />
-            <span>Filters</span>
-          </button>
+          <div className="relative">
+            <select
+              value={vehicleCategory}
+              onChange={(e) => setVehicleCategory(e.target.value)}
+              className="appearance-none w-full bg-white border border-gray-300 rounded-xl py-3 pl-4 pr-10 text-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="">All Categories</option>
+              <option value="car">Car</option>
+              <option value="van">Van</option>
+              <option value="lorry">Lorry</option>
+              <option value="bus">Bus</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <Filter className="w-4 h-4" />
+            </div>
+          </div>
           <button
             onClick={handleAddClick}
             className="gradient-primary text-black px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
